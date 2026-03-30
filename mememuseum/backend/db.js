@@ -1,11 +1,10 @@
-// backend/db.js
-const { Pool } = require('pg');
-require('dotenv').config();
-
+import pkg from 'pg';
+const { Pool } = pkg;
+import 'dotenv/config';
 
 // Crea una connessione al database usando il pool
 const pool = new Pool({
-connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL,
 });
 
 // Funzione di test della connessione al database
@@ -18,7 +17,7 @@ async function testConnection() {
     }
 }
 
-// Verifica la connessione appena il modulo viene caricato
-testConnection();
 
-module.exports ={ pool };
+
+// Esportazione per i moduli ESM
+export { pool };

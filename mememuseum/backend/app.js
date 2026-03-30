@@ -1,8 +1,10 @@
 // backend/app.js
-const express = require('express');
+import express from 'express';
+import cors from 'cors';
+import { pool } from './db.js';  
+import authRoutes from './routes/authRoutes.js';
+
 const app = express();
-const db = require('./db');
-const authRoutes = require('./routes/authRoutes');
 
 
 
@@ -14,6 +16,7 @@ app.use(express.json());    // Parsing del corpo delle richieste in JSON
 const PORT = process.env.PORT || 3000;
 
 // --- ROTTE ---
+app.use(cors()); // Abilita CORS per tutte le rotte 
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
@@ -22,7 +25,7 @@ app.get('/', (req, res) => {
 
 // --- GESTIONE ERRORI ---
 
-// 404 - Risorsa non trovata (va messo DOPO tutte le altre rotte)
+// 404 - Risorsa non trovata 
 app.use((req, res, next) => {
     res.status(404).json({ error: 'Risorsa non trovata' });
 });
@@ -39,7 +42,8 @@ app.use((err, req, res, next) => {
 async function connectDatabase() {
     try {
         //Connessione al database
-        const client = await db.pool.connect(); 
+        const client = await pool.connect(); 
+        console.log('Connesso al database con successo');
         client.release(); 
 
         //Avvio effettivo del server sulla porta 3000
