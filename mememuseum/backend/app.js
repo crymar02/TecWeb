@@ -1,0 +1,57 @@
+// backend/app.js
+const express = require('express');
+const app = express();
+const db = require('./db');
+const authRoutes = require('./routes/authRoutes');
+
+
+
+
+// --- SICUREZZA E MIDDLEWARE BASE ---
+app.disable('x-powered-by'); // Nasconde Express agli attaccanti
+app.use(express.json());    // Parsing del corpo delle richieste in JSON
+
+const PORT = process.env.PORT || 3000;
+
+// --- ROTTE ---
+app.use('/api/auth', authRoutes);
+
+app.get('/', (req, res) => {
+    res.send('Ciao, benvenuto nel MEMEMUSEUM!');
+});
+
+// --- GESTIONE ERRORI ---
+
+// 404 - Risorsa non trovata (va messo DOPO tutte le altre rotte)
+app.use((req, res, next) => {
+    res.status(404).json({ error: 'Risorsa non trovata' });
+});
+
+// 500 - Errore interno globale
+app.use((err, req, res, next) => {
+    console.error('Errore catturato:', err.stack);
+    res.status(500).json({ error: 'Errore interno del server', message: err.message });
+});
+
+// --- AVVIO APPLICAZIONE ---
+
+// Funzione per connettersi al database
+async function connectDatabase() {
+    try {
+        //Connessione al database
+        const client = await db.pool.connect(); 
+        client.release(); 
+
+        //Avvio effettivo del server sulla porta 3000
+        app.listen(PORT, () => {
+            console.log(`Server in esecuzione su http://localhost:${PORT}`);
+        });
+    } catch (err) {
+        console.error('Errore durante l\'avvio:', err.message);
+        process.exit(1); 
+    }
+}
+
+connectDatabase();
+
+
