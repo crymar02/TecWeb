@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
     const [credentials, setCredentials] = useState({ email: '', password: '' });
     const navigate = useNavigate();
 
@@ -20,6 +20,9 @@ const Login = () => {
             localStorage.setItem('username', res.data.user.username);
             
             alert("Login effettuato!");
+            if (onLoginSuccess) {
+                onLoginSuccess();
+            }
             navigate('/'); // Reindirizza alla home
         } catch (err) {
             alert("Credenziali errate");

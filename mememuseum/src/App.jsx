@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css'; 
 import Home from './components/Home.jsx';
 import Login from './components/Auth/Login.jsx';
-import Signup from './components/Auth/Singup.jsx';
+import Signup from './components/Auth/Signup.jsx';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -13,11 +13,15 @@ function App() {
     setIsLoggedIn(!!token);
   }, []);
 
+  const checkLoginStatus = () => {
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     setIsLoggedIn(false);
-    window.location.href = '/login';
   };
 
   return (
@@ -51,7 +55,7 @@ function App() {
         <div className="content">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login onLoginSuccess={checkLoginStatus} />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="*" element={<h2>404 - Pagina non trovata</h2>} />
           </Routes>
