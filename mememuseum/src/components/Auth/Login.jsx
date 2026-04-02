@@ -15,9 +15,10 @@ const Login = ({ onLoginSuccess }) => {
         try {
             const res = await axios.post('http://localhost:3000/api/auth/login', credentials);
             
-            // Salviamo il token nel localStorage [cite: 170-185]
+            // Salviamo il token nel localStorage per mantenere la sessione
             localStorage.setItem('token', res.data.token);
             localStorage.setItem('username', res.data.user.username);
+            localStorage.setItem('userId', res.data.user.id);
             
             alert("Login effettuato!");
             if (onLoginSuccess) {

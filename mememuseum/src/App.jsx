@@ -1,3 +1,4 @@
+// App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css'; 
@@ -21,6 +22,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('userId'); 
     setIsLoggedIn(false);
   };
 
@@ -33,31 +35,23 @@ function App() {
           </div>
           <div className="menu">
             <Link to="/" className="nav-link">Home</Link>
-            
             {!isLoggedIn ? (
               <>
                 <Link to="/login" className="nav-link">Login</Link>
                 <Link to="/signup" className="btn-signup">Registrati</Link>
               </>
             ) : (
-              <>
-                <span className="user-welcome">
-                  Ciao, <strong>{localStorage.getItem('username')}</strong>!
-                </span>
-                <button onClick={handleLogout} className="btn-logout">
-                  Logout
-                </button>
-              </>
+              <button onClick={handleLogout} className="btn-logout">Logout</button>
             )}
           </div>
         </nav>
 
         <div className="content">
           <Routes>
-            <Route path="/" element={<Home />} />
+            {/* Passiamo lo stato alla Home */}
+            <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
             <Route path="/login" element={<Login onLoginSuccess={checkLoginStatus} />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="*" element={<h2>404 - Pagina non trovata</h2>} />
           </Routes>
         </div>
       </div>

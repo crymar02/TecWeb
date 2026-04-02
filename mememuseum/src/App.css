@@ -67,3 +67,60 @@
   max-width: 1200px;
   margin: 0 auto;
 }
+
+/* Stile per l'area centrale di caricamento */
+.welcome-upload-section {
+  text-align: center;
+  background-color: #f8f9fa;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+.central-upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 500px;
+  margin: 30px auto 0;
+}
+
+.central-upload-form input, 
+.central-upload-form textarea {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.central-upload-form textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.btn-main-upload {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.btn-main-upload:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.file-input-wrapper {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.9rem;
+  color: #555;
+}

@@ -1,23 +1,28 @@
 // backend/app.js
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { pool } from './db.js';  
 import authRoutes from './routes/authRoutes.js';
+import memeRoutes from './routes/memeRoutes.js';
 
 const app = express();
-
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 // --- SICUREZZA E MIDDLEWARE BASE ---
 app.disable('x-powered-by'); // Nasconde Express agli attaccanti
 app.use(express.json());    // Parsing del corpo delle richieste in JSON
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 3000;
 
 // --- ROTTE ---
 app.use(cors()); // Abilita CORS per tutte le rotte 
 app.use('/api/auth', authRoutes);
+app.use('/api/memes', memeRoutes);
 
 app.get('/', (req, res) => {
     res.send('Ciao, benvenuto nel MEMEMUSEUM!');
