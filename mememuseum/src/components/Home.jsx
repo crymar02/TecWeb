@@ -1,20 +1,25 @@
 // src/components/Home.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Importiamo navigate per il redirect
 
 const Home = ({ isLoggedIn }) => {
+  const navigate = useNavigate();
+  const [memes, setMemes] = useState([]);
+  const [showForm, setShowForm] = useState(false); // Stato per mostrare/nascondere il form
+
+  // Stati per i campi del form
   const [titolo, setTitolo] = useState('');
   const [descrizione, setDescrizione] = useState('');
   const [file, setFile] = useState(null);
-  const [memes, setMemes] = useState([]);
 
-  // Funzione per recuperare i meme dal backend
+  // Recupera i meme
   const fetchMemes = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/memes');
-      setMemes(response.data);
+      const res = await axios.get('http://localhost:3000/api/memes');
+      setMemes(res.data);
     } catch (err) {
-      console.error("Errore nel recupero della galleria:", err);
+      console.error("Errore gallery:", err);
     }
   };
 
@@ -25,101 +30,120 @@ const Home = ({ isLoggedIn }) => {
   const handleUpload = async (e) => {
     e.preventDefault();
     const userId = localStorage.getItem('userId');
-    const parsedUserId = parseInt(userId);
-
-    if (!userId || isNaN(parsedUserId)) {
-      alert("Sessione non valida. Per favore, riesegui il login.");
-      return;
-    }
-
     const formData = new FormData();
     formData.append('titolo', titolo);
     formData.append('descrizione', descrizione);
     formData.append('immagine', file);
-    formData.append('user_id', parsedUserId);
+    formData.append('user_id', userId);
 
     try {
-      const response = await axios.post('http://localhost:3000/api/memes/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
-
-      if (response.status === 201 || response.status === 200) {
-        alert("Meme caricato con successo! 🖼️");
-        setTitolo('');
-        setDescrizione('');
-        setFile(null);
-        e.target.reset();
-        fetchMemes(); // Ricarica la galleria per vedere il nuovo meme
-      }
+      await axios.post('http://localhost:3000/api/memes/upload', formData);
+      alert("Meme pubblicato!");
+      // Reset campi e chiusura form
+      setTitolo('');
+      setDescrizione('');
+      setFile(null);
+      setShowForm(false); 
+      e.target.reset();
+      fetchMemes(); // Ricarica la lista
     } catch (err) {
-      alert("Errore durante il caricamento");
+      alert("Errore upload");
+    }
+  };
+
+  const handleDelete = async (memeId) => {
+    if (!window.confirm("Rimuovere l'opera?")) return;
+    try {
+      await axios.delete(`http://localhost:3000/api/memes/${memeId}`, {
+        data: { user_id: localStorage.getItem('userId') }
+      });
+      fetchMemes();
+    } catch (err) { alert("Errore cancellazione"); }
+  };
+
+  // Funzione per gestire il click sul "+"
+  const handlePlusClick = () => {
+    if (isLoggedIn) {
+      setShowForm(true); // Mostra il form se loggato
+    } else {
+      alert("Devi effettuare il login o registrarti per esporre le tue opere nel museo!");
+      navigate('/login'); // Reindirizza al login se ospite
     }
   };
 
   return (
     <div className="home-container">
-      {/* SEZIONE 1: Messaggio di Benvenuto e Form (Solo se Loggato) */}
-      {isLoggedIn ? (
-        <div className="welcome-upload-section">
-          <h1>Ciao, {localStorage.getItem('username')}!</h1>
-          <p className="sub-welcome">Sei pronto a caricare nuovi meme?</p>
-          
-          <div className="upload-box">
-            <form onSubmit={handleUpload} className="central-upload-form">
+      
+      {/* Intestazione del Museo */}
+      <div className="museum-header">
+        {isLoggedIn ? (
+          <h1>Bentornato, {localStorage.getItem('username')}!</h1>
+        ) : (
+          <h1>Benvenuto nel Mememuseum 🏛️</h1>
+        )}
+        <p>Esplora l'esposizione corrente o contribuisci con la tua arte.</p>
+      </div>
+
+      {/* Griglia della Galleria */}
+      <div className="gallery-grid">
+        
+        {/* CARD CREATIVA (Il pulsante "+" o il Form) */}
+        <div className={`meme-card create-card ${showForm ? 'form-active' : ''}`}>
+          {!showForm ? (
+            // Stato 1: Il grande "+" centrale
+            <div className="plus-icon-wrapper" onClick={handlePlusClick}>
+              <span className="plus-icon">+</span>
+              <p>Aggiungi Opera</p>
+            </div>
+          ) : (
+            // Stato 2: Il Form di upload (visibile solo se loggato e showForm è true)
+            <form onSubmit={handleUpload} className="card-upload-form">
+              <h3>Nuova Esposizione</h3>
               <input 
                 type="text" 
-                placeholder="Dai un titolo alla tua opera..." 
+                placeholder="Titolo dell'opera..." 
                 value={titolo}
                 onChange={(e) => setTitolo(e.target.value)}
                 required 
               />
               <textarea 
-                placeholder="Scrivi una breve descrizione (opzionale)..." 
+                placeholder="Breve descrizione (opzionale)..." 
                 value={descrizione}
                 onChange={(e) => setDescrizione(e.target.value)}
               />
-              <div className="file-input-group">
-                <label htmlFor="file-upload">Seleziona l'immagine:</label>
-                <input 
-                  id="file-upload"
-                  type="file" 
-                  accept="image/*" 
-                  onChange={(e) => setFile(e.target.files[0])} 
-                  required 
-                />
+              <input 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => setFile(e.target.files[0])} 
+                required 
+              />
+              <div className="form-buttons">
+                <button type="submit" className="btn-publish">Pubblica</button>
+                <button type="button" className="btn-cancel" onClick={() => setShowForm(false)}>Annulla</button>
               </div>
-              <button type="submit" className="btn-main-upload">
-                Pubblica nel Museo
-              </button>
             </form>
-          </div>
-        </div>
-      ) : (
-        <div className="guest-welcome">
-          <h1>Benvenuto nel Mememuseum 🏛️</h1>
-          <p>Effettua il login per esporre le tue opere nella galleria.</p>
-        </div>
-      )}
-
-      {/* SEZIONE 2: Galleria dei Meme (Sempre visibile) */}
-      <div className="meme-gallery">
-        <h2 className="gallery-title">Galleria delle Opere</h2>
-        <div className="gallery-grid">
-          {memes.length > 0 ? (
-            memes.map((meme) => (
-              <div key={meme.id_meme} className="meme-card">
-                <img src={meme.url_immagine} alt={meme.titolo} className="meme-img" />
-                <div className="meme-info">
-                  <h3>{meme.titolo}</h3>
-                  <p>{meme.descrizione}</p>
-                  <span className="author">Artista: <strong>{meme.username}</strong></span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>Il museo è ancora vuoto. Sii il primo a esporre!</p>
           )}
         </div>
+
+        {/* CARD DEI MEME ESISTENTI */}
+        {memes.map((meme) => (
+          <div key={meme.id_meme} className="meme-card">
+            <img src={meme.url_immagine} alt={meme.titolo} className="meme-img" />
+            <div className="meme-info">
+              <h3>{meme.titolo}</h3>
+              <p>{meme.descrizione}</p>
+              <div className="meme-footer">
+                <span className="author">Artista: <strong>{meme.username}</strong></span>
+                {/* Tasto Elimina condizionale */}
+                {isLoggedIn && parseInt(localStorage.getItem('userId')) === meme.user_id && (
+                  <button onClick={() => handleDelete(meme.id_meme)} className="btn-delete-mini">
+                    🗑️
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

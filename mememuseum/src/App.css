@@ -1,6 +1,8 @@
 /* App.css */
 .App {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f2f5; /* Sfondo leggermente grigio per far risaltare le card bianche */
+  min-height: 100vh;
 }
 
 /* Navbar */
@@ -11,6 +13,10 @@
   padding: 1rem 2rem;
   background-color: #282c34; 
   color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
 }
 
 .logo a {
@@ -57,119 +63,210 @@
   transition: background-color 0.3s;
 }
 
-.btn-logout:hover {
-  background-color: #cc0000;
-}
+/* --- HOME & GALLERY LAYOUT --- */
 
-/* Contenuto */
-.content {
-  padding: 20px;
-  max-width: 1200px;
+.home-container {
+  max-width: 1400px;
   margin: 0 auto;
-}
-
-/* Stile per l'area centrale di caricamento */
-.welcome-upload-section {
-  text-align: center;
-  background-color: #f8f9fa;
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  margin-top: 20px;
-}
-
-.central-upload-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  max-width: 500px;
-  margin: 30px auto 0;
-}
-
-.central-upload-form input, 
-.central-upload-form textarea {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.central-upload-form textarea {
-  height: 100px;
-  resize: vertical;
-}
-
-.btn-main-upload {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 15px;
-  border-radius: 8px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.btn-main-upload:hover {
-  background-color: #218838;
-  transform: translateY(-2px);
-}
-
-.file-input-wrapper {
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  font-size: 0.9rem;
-  color: #555;
-}
-
-/* Stile Galleria */
-.meme-gallery {
-  margin-top: 40px;
   padding: 20px;
+}
+
+.museum-header {
+  text-align: center;
+  margin: 40px 0;
 }
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 25px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 20px 0;
 }
 
+/* --- CARD STYLE (Base) --- */
 .meme-card {
   background: white;
-  border-radius: 12px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: transform 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 450px; /* Altezza fissa per mantenere la griglia ordinata */
 }
 
 .meme-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
 
-.meme-card img {
+.meme-img {
   width: 100%;
   height: 250px;
   object-fit: cover;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .meme-info {
-  padding: 15px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: space-between;
 }
 
 .meme-info h3 {
   margin: 0 0 10px 0;
-  color: #282c34;
+  font-size: 1.25rem;
+  color: #1a1a1a;
 }
 
-.meme-info .author {
-  display: block;
-  margin-top: 10px;
+.meme-info p {
+  font-size: 0.95rem;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.meme-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 15px;
+}
+
+.author {
   font-size: 0.85rem;
-  font-weight: bold;
+  color: #888;
+}
+
+.author strong {
   color: #61dafb;
+}
+
+/* --- CREATE CARD (Dinamica con il +) --- */
+.create-card {
+  background-color: #f8f9fa;
+  border: 3px dashed #dee2e6;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.create-card:hover {
+  background-color: #ffffff;
+  border-color: #61dafb;
+}
+
+.plus-icon-wrapper {
+  text-align: center;
+  color: #adb5bd;
+  transition: color 0.3s;
+}
+
+.create-card:hover .plus-icon-wrapper {
+  color: #61dafb;
+}
+
+.plus-icon {
+  font-size: 4rem;
+  display: block;
+  line-height: 1;
+}
+
+.create-card.form-active {
+  background-color: white;
+  border: 1px solid #eee;
+  cursor: default;
+  padding: 20px;
+}
+
+/* --- FORM DENTRO LA CARD --- */
+.card-upload-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-upload-form h3 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.card-upload-form input, 
+.card-upload-form textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.card-upload-form input:focus, 
+.card-upload-form textarea:focus {
+  border-color: #61dafb;
+}
+
+.card-upload-form textarea {
+  height: 80px;
+  resize: none;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.btn-publish {
+  flex: 2;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  flex: 1;
+  background-color: #f0f0f0;
+  color: #666;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* --- PULSANTI AZIONE --- */
+.btn-delete-mini {
+  background: #fff0f0;
+  border: 1px solid #ffebeb;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+}
+
+.btn-delete-mini:hover {
+  background: #ff4d4d;
+  color: white;
+  transform: scale(1.1);
+}
+
+/* Messaggio Galleria Vuota */
+.empty-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px;
+  color: #999;
+  font-style: italic;
 }

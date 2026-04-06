@@ -55,4 +55,29 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Rotta per eliminare un meme
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { user_id } = req.body; // Passiamo l'id utente per sicurezza
+
+    try {
+        // Verifichiamo che il meme appartenga effettivamente all'utente
+        const checkMeme = await pool.query(
+            'SELECT * FROM meme WHERE id_meme = $1 AND user_id = $2',
+            [id, user_id]
+        );
+
+        if (checkMeme.rows.length === 0) {
+            return res.status(403).json({ error: "Non sei autorizzato o il meme non esiste" });
+        }
+
+        await pool.query('DELETE FROM meme WHERE id_meme = $1', [id]);
+        
+        res.json({ message: "Meme eliminato con successo dal museo" });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: "Errore durante l'eliminazione" });
+    }
+});
+
 export default router;
