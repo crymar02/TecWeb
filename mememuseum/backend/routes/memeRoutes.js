@@ -38,4 +38,21 @@ router.post('/upload', upload.single('immagine'), async (req, res) => {
     }
 });
 
+// Rotta per ottenere tutti i meme
+router.get('/', async (req, res) => {
+    try {
+        const query = `
+            SELECT m.*, u.username 
+            FROM meme m 
+            JOIN utente u ON m.user_id = u.user_id 
+            ORDER BY m.data_creazione DESC`;
+        
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: "Errore nel recupero dei meme" });
+    }
+});
+
 export default router;
