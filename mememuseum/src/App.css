@@ -1,18 +1,35 @@
-/* App.css */
+/* --- 1. VARIABILI E BASE --- */
+:root {
+  --primary-color: #800208;   /* Bordeaux Museo */
+  --secondary-color: #F5F5DC; /* Crema Sfondo */
+  --accent-color: #ff0000;    /* Rosso Pulsanti */
+  --text-dark: #000000;
+  --text-muted: #000000;
+  --white: #ffffff;
+  --shadow: 0 4px 15px rgba(0,0,0,0.1);
+  --shadow-hover: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 .App {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5; /* Sfondo leggermente grigio per far risaltare le card bianche */
+  background-color: var(--secondary-color);
   min-height: 100vh;
 }
 
-/* Navbar */
+/* --- 2. LAYOUT E NAVIGAZIONE --- */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background-color: #282c34; 
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -22,7 +39,7 @@
 .logo a {
   font-size: 1.5rem;
   font-weight: bold;
-  color: white;
+  color: var(--secondary-color);
   text-decoration: none;
 }
 
@@ -33,28 +50,28 @@
 }
 
 .nav-link {
-  color: white;
+  color: var(--secondary-color);
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .nav-link:hover {
-  color: #61dafb; 
+  color: var(--text-dark);
 }
 
-/* Pulsanti */
+/* --- 3. PULSANTI GENERALI --- */
 .btn-signup {
-  background-color: #61dafb; 
+  background-color: var(--accent-color);
   padding: 8px 16px;
   border-radius: 5px;
-  color: #282c34 !important;
+  color: var(--text-dark) !important;
   font-weight: bold;
   text-decoration: none;
 }
 
 .btn-logout {
-  background-color: #ff4d4d; 
-  color: white;
+  background-color: var(--accent-color);
+  color: var(--white);
   border: none;
   padding: 8px 16px;
   border-radius: 5px;
@@ -63,8 +80,7 @@
   transition: background-color 0.3s;
 }
 
-/* --- HOME & GALLERY LAYOUT --- */
-
+/* --- 4. CONTENITORI PRINCIPALI --- */
 .home-container {
   max-width: 1400px;
   margin: 0 auto;
@@ -83,21 +99,21 @@
   padding: 20px 0;
 }
 
-/* --- CARD STYLE (Base) --- */
+/* --- 5. CARD MEME (Visualizzazione) --- */
 .meme-card {
-  background: white;
+  background: var(--white);
   border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   display: flex;
   flex-direction: column;
-  height: 450px; /* Altezza fissa per mantenere la griglia ordinata */
+  height: 450px;
 }
 
 .meme-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+  box-shadow: var(--shadow-hover);
 }
 
 .meme-img {
@@ -118,37 +134,56 @@
 .meme-info h3 {
   margin: 0 0 10px 0;
   font-size: 1.25rem;
-  color: #1a1a1a;
+  color: var(--text-dark);
 }
 
 .meme-info p {
   font-size: 0.95rem;
-  color: #666;
+  color: var(--text-dark);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
+/* --- 6. FOOTER CARD E META DATI --- */
 .meme-footer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  padding-top: 15px;
+  justify-content: space-between; 
+  align-items: flex-end; 
+  width: 100%;
+  margin-top: 10px;
+  min-height: 45px; 
+}
+
+.meme-meta {
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; 
+  justify-content: flex-start;
+  text-align: left;
+  gap: 2px;
+  flex-shrink: 0; 
+  max-width: 60%; 
 }
 
 .author {
   font-size: 0.85rem;
-  color: #888;
+  color: #000000;
+  display: block; 
+  line-height: 1.2;
 }
 
-.author strong {
-  color: #61dafb;
+.meme-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
+  display: block; 
+  line-height: 1.2;
 }
-
-/* --- CREATE CARD (Dinamica con il +) --- */
+/* --- 7. CARDS DINAMICHE (Upload e "+" ) --- */
 .create-card {
   background-color: #f8f9fa;
   border: 3px dashed #dee2e6;
@@ -159,18 +194,13 @@
 }
 
 .create-card:hover {
-  background-color: #ffffff;
-  border-color: #61dafb;
+  background-color: var(--white);
+  border-color: #8B4513; /* Colore legno/cornice */
 }
 
 .plus-icon-wrapper {
   text-align: center;
-  color: #adb5bd;
-  transition: color 0.3s;
-}
-
-.create-card:hover .plus-icon-wrapper {
-  color: #61dafb;
+  color: #8B4513;
 }
 
 .plus-icon {
@@ -180,23 +210,18 @@
 }
 
 .create-card.form-active {
-  background-color: white;
+  background-color: var(--white);
   border: 1px solid #eee;
   cursor: default;
   padding: 20px;
 }
 
-/* --- FORM DENTRO LA CARD --- */
+/* --- 8. FORM DI UPLOAD --- */
 .card-upload-form {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.card-upload-form h3 {
-  text-align: center;
-  margin-bottom: 5px;
 }
 
 .card-upload-form input, 
@@ -208,14 +233,8 @@
   outline: none;
 }
 
-.card-upload-form input:focus, 
-.card-upload-form textarea:focus {
-  border-color: #61dafb;
-}
-
-.card-upload-form textarea {
-  height: 80px;
-  resize: none;
+.card-upload-form input:focus {
+  border-color: var(--text-dark);
 }
 
 .form-buttons {
@@ -224,45 +243,79 @@
   margin-top: 5px;
 }
 
-.btn-publish {
-  flex: 2;
-  background-color: #28a745;
-  color: white;
+.btn-publish, .btn-cancel {
   border: none;
   padding: 10px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
+  color: var(--white);
+  background-color: var(--primary-color);
 }
 
-.btn-cancel {
-  flex: 1;
-  background-color: #f0f0f0;
-  color: #666;
-  border: none;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
+/* --- 9. ELIMINAZIONE E CONFERMA --- */
+.delete-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  flex-grow: 1; 
+}
+.delete-container {
+  display: flex;
+  align-items: center;
 }
 
-/* --- PULSANTI AZIONE --- */
 .btn-delete-mini {
-  background: #fff0f0;
+  background: var(--primary-color);
   border: 1px solid #ffebeb;
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 1rem;
 }
 
 .btn-delete-mini:hover {
-  background: #ff4d4d;
-  color: white;
+  background: var(--accent-color);
   transform: scale(1.1);
 }
 
-/* Messaggio Galleria Vuota */
+.confirm-box {
+  background: #fff0f0;
+  border: 1px solid var(--accent-color);
+  padding: 4px 8px;
+  border-radius: 8px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  font-size: 0.8rem;
+  animation: fadeIn 0.3s ease;
+  white-space: nowrap; /* Impedisce al testo "Sicuro?" di andare a capo */
+}
+
+.btn-confirm-yes {
+  background: #ff4d4d;
+  color: var(--white);
+  border: none;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-confirm-no {
+  background: #ccc;
+  color: var(--white);
+  border: none;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* --- 10. MESSAGGI DI STATO --- */
 .empty-message {
   grid-column: 1 / -1;
   text-align: center;

@@ -1,19 +1,18 @@
 // src/components/Home.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Importiamo navigate per il redirect
+import { useNavigate } from 'react-router-dom';
 
 const Home = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const [memes, setMemes] = useState([]);
-  const [showForm, setShowForm] = useState(false); // Stato per mostrare/nascondere il form
+  const [showForm, setShowForm] = useState(false); 
+  const [memeDaEliminare, setMemeDaEliminare] = useState(null);
 
-  // Stati per i campi del form
   const [titolo, setTitolo] = useState('');
   const [descrizione, setDescrizione] = useState('');
   const [file, setFile] = useState(null);
 
-  // Recupera i meme
   const fetchMemes = async () => {
     try {
       const res = await axios.get('http://localhost:3000/api/memes');
@@ -39,42 +38,40 @@ const Home = ({ isLoggedIn }) => {
     try {
       await axios.post('http://localhost:3000/api/memes/upload', formData);
       alert("Meme pubblicato!");
-      // Reset campi e chiusura form
       setTitolo('');
       setDescrizione('');
       setFile(null);
       setShowForm(false); 
       e.target.reset();
-      fetchMemes(); // Ricarica la lista
+      fetchMemes();
     } catch (err) {
       alert("Errore upload");
     }
   };
 
-  const handleDelete = async (memeId) => {
-    if (!window.confirm("Rimuovere l'opera?")) return;
+  const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/memes/${memeId}`, {
+      await axios.delete(`http://localhost:3000/api/memes/${id}`, {
         data: { user_id: localStorage.getItem('userId') }
       });
+      setMemeDaEliminare(null);
       fetchMemes();
-    } catch (err) { alert("Errore cancellazione"); }
+    } catch (err) {
+      alert("Errore durante l'eliminazione");
+    }
   };
 
-  // Funzione per gestire il click sul "+"
   const handlePlusClick = () => {
     if (isLoggedIn) {
-      setShowForm(true); // Mostra il form se loggato
+      setShowForm(true);
     } else {
       alert("Devi effettuare il login o registrarti per esporre le tue opere nel museo!");
-      navigate('/login'); // Reindirizza al login se ospite
+      navigate('/login');
     }
   };
 
   return (
     <div className="home-container">
-      
-      {/* Intestazione del Museo */}
       <div className="museum-header">
         {isLoggedIn ? (
           <h1>Bentornato, {localStorage.getItem('username')}!</h1>
@@ -84,19 +81,14 @@ const Home = ({ isLoggedIn }) => {
         <p>Esplora l'esposizione corrente o contribuisci con la tua arte.</p>
       </div>
 
-      {/* Griglia della Galleria */}
       <div className="gallery-grid">
-        
-        {/* CARD CREATIVA (Il pulsante "+" o il Form) */}
         <div className={`meme-card create-card ${showForm ? 'form-active' : ''}`}>
           {!showForm ? (
-            // Stato 1: Il grande "+" centrale
             <div className="plus-icon-wrapper" onClick={handlePlusClick}>
               <span className="plus-icon">+</span>
               <p>Aggiungi Opera</p>
             </div>
           ) : (
-            // Stato 2: Il Form di upload (visibile solo se loggato e showForm è true)
             <form onSubmit={handleUpload} className="card-upload-form">
               <h3>Nuova Esposizione</h3>
               <input 
@@ -107,7 +99,7 @@ const Home = ({ isLoggedIn }) => {
                 required 
               />
               <textarea 
-                placeholder="Breve descrizione (opzionale)..." 
+                placeholder="Descrizione..." 
                 value={descrizione}
                 onChange={(e) => setDescrizione(e.target.value)}
               />
@@ -125,25 +117,45 @@ const Home = ({ isLoggedIn }) => {
           )}
         </div>
 
-        {/* CARD DEI MEME ESISTENTI */}
         {memes.map((meme) => (
           <div key={meme.id_meme} className="meme-card">
             <img src={meme.url_immagine} alt={meme.titolo} className="meme-img" />
             <div className="meme-info">
               <h3>{meme.titolo}</h3>
               <p>{meme.descrizione}</p>
+              
               <div className="meme-footer">
-                <span className="author">Artista: <strong>{meme.username}</strong></span>
-                {/* Tasto Elimina condizionale */}
-                {isLoggedIn && parseInt(localStorage.getItem('userId')) === meme.user_id && (
-                  <button onClick={() => handleDelete(meme.id_meme)} className="btn-delete-mini">
-                    🗑️
-                  </button>
-                )}
+                <div className="meme-meta">
+                  <span className="author">Artista: <strong>{meme.username}</strong></span>
+                  <span className="meme-date">
+                    {new Date(meme.data_creazione).toLocaleDateString('it-IT')}
+                  </span>
+                </div>
+
+                <div className="delete-wrapper">
+                  {isLoggedIn && parseInt(localStorage.getItem('userId')) === meme.user_id && (
+                    <div className="delete-container">
+                      {memeDaEliminare === meme.id_meme ? (
+                        <div className="confirm-box">
+                          <span>Sicuro?</span>
+                          <button onClick={() => handleDelete(meme.id_meme)} className="btn-confirm-yes">Sì</button>
+                          <button onClick={() => setMemeDaEliminare(null)} className="btn-confirm-no">No</button>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={() => setMemeDaEliminare(meme.id_meme)} 
+                          className="btn-delete-mini"
+                        >
+                          🗑️
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        ))}
+        ))}     
       </div>
     </div>
   );
