@@ -8,25 +8,24 @@ const router = express.Router();
 // Configurazione dello storage per multer
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Assicurati di creare questa cartella in /backend
+    cb(null, 'uploads/'); 
   },
   filename: (req, file, cb) => {
-    // Rinomina il file con un timestamp per evitare duplicati
     cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
 const upload = multer({ storage: storage });
 
-// Rotta POST per l'upload
+// 1. Rotta POST per l'upload
 router.post('/upload', upload.single('immagine'), async (req, res) => {
     try {
         const { titolo, descrizione, user_id } = req.body;
         const url_immagine = `http://localhost:3000/uploads/${req.file.filename}`;
 
-        // Definizione query basata sui tuoi campi e sulla struttura del database
         const query = `
-            INSERT INTO meme (titolo, descrizione, url_immagine, user_id) VALUES ($1, $2, $3, $4) RETURNING *`;
+            INSERT INTO meme (titolo, descrizione, url_immagine, user_id) 
+            VALUES ($1, $2, $3, $4) RETURNING *`;
 
         const values = [titolo, descrizione, url_immagine, parseInt(user_id)];
 
@@ -38,30 +37,45 @@ router.post('/upload', upload.single('immagine'), async (req, res) => {
     }
 });
 
-// Rotta per ottenere tutti i meme
+// 2. Rotta GET (UNIFICATA): Ottiene meme con username, likes, dislikes e commenti
 router.get('/', async (req, res) => {
     try {
         const query = `
-            SELECT m.*, u.username 
-            FROM meme m 
-            JOIN utente u ON m.user_id = u.user_id 
-            ORDER BY m.data_creazione DESC`;
+            SELECT 
+                m.*, 
+                u.username,
+                (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,
+                (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = FALSE) AS dislikes,
+                COALESCE(
+                    (SELECT json_agg(json_build_object(
+                        'id_commento', c.id_commento,
+                        'contenuto', c.contenuto,
+                        'username', uc.username
+                    ))
+                     FROM commento c
+                     JOIN utente uc ON c.user_id = uc.user_id
+                     WHERE c.meme_id = m.id_meme
+                    ), '[]'
+                ) AS commenti
+            FROM meme m
+            JOIN utente u ON m.user_id = u.user_id
+            ORDER BY m.data_creazione DESC;
+        `;
         
         const result = await pool.query(query);
         res.json(result.rows);
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ error: "Errore nel recupero dei meme" });
+        console.error("Errore nel recupero dei meme:", err.message);
+        res.status(500).json({ error: err.message });
     }
 });
 
-// Rotta per eliminare un meme
+// 3. Rotta DELETE: Elimina un meme
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
-    const { user_id } = req.body; // Passiamo l'id utente per sicurezza
+    const { user_id } = req.body; 
 
     try {
-        // Verifichiamo che il meme appartenga effettivamente all'utente
         const checkMeme = await pool.query(
             'SELECT * FROM meme WHERE id_meme = $1 AND user_id = $2',
             [id, user_id]
@@ -72,7 +86,6 @@ router.delete('/:id', async (req, res) => {
         }
 
         await pool.query('DELETE FROM meme WHERE id_meme = $1', [id]);
-        
         res.json({ message: "Meme eliminato con successo dal museo" });
     } catch (err) {
         console.error(err.message);

@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url';
 import { pool } from './db.js';  
 import authRoutes from './routes/authRoutes.js';
 import memeRoutes from './routes/memeRoutes.js';
+import commentoRoutes from './routes/commentoRoutes.js';
+import votoRoutes from './routes/votoRoutes.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -23,6 +25,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors()); // Abilita CORS per tutte le rotte 
 app.use('/api/auth', authRoutes);
 app.use('/api/memes', memeRoutes);
+app.use('/api/voti', votoRoutes);
+app.use('/api/commenti', commentoRoutes);
 
 app.get('/', (req, res) => {
     res.send('Ciao, benvenuto nel MEMEMUSEUM!');
