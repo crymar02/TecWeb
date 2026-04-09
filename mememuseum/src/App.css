@@ -109,6 +109,7 @@
   display: flex;
   flex-direction: column;
   height: 450px;
+  position: relative;
 }
 
 .meme-card:hover {
@@ -254,66 +255,86 @@
 }
 
 /* --- 9. ELIMINAZIONE E CONFERMA --- */
-.delete-wrapper {
+
+.top-delete-container {
+  position: absolute;
+  top: 10px;    /* Distanza dal bordo superiore */
+  right: 10px;  /* Distanza dal bordo destro */
+  z-index: 10;  /* Assicura che stia sopra l'immagine */
   display: flex;
+  align-items: center;
   justify-content: flex-end;
-  align-items: center;
-  flex-grow: 1; 
 }
-.delete-container {
+
+.btn-delete-cross {
+  background: rgba(255, 255, 255, 0.7); /* Sfondo semi-trasparente per visibilità su foto */
+  color: #333;
+  border: none;
+  font-size: 24px; /* Dimensione della X */
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%; /* Rende il pulsante circolare */
+  cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  padding: 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-.btn-delete-mini {
-  background: var(--primary-color);
-  border: 1px solid #ffebeb;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-delete-mini:hover {
-  background: var(--accent-color);
+.btn-delete-cross:hover {
+  background: #ff4d4d; /* Diventa rossa al passaggio del mouse */
+  color: white;
   transform: scale(1.1);
 }
 
-.confirm-box {
-  background: #fff0f0;
-  border: 1px solid var(--accent-color);
-  padding: 4px 8px;
-  border-radius: 8px;
+/* Stile per il Box di Conferma in alto (più compatto) */
+.confirm-box-top {
+  background: white;
+  border: 1px solid #ff4d4d;
+  padding: 5px 10px;
+  border-radius: 20px; /* Bordi molto arrotondati */
   display: flex;
-  gap: 5px;
+  gap: 6px;
   align-items: center;
   font-size: 0.8rem;
-  animation: fadeIn 0.3s ease;
-  white-space: nowrap; /* Impedisce al testo "Sicuro?" di andare a capo */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  animation: fadeInCross 0.3s ease;
+  white-space: nowrap;
 }
 
-.btn-confirm-yes {
+.confirm-box-top span {
+  font-weight: bold;
+  color: #333;
+}
+
+.btn-confirm-yes-small, .btn-confirm-no-small {
+  border: none;
+  padding: 3px 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.75rem;
+}
+
+.btn-confirm-yes-small {
   background: #ff4d4d;
-  color: var(--white);
-  border: none;
-  padding: 2px 8px;
-  border-radius: 4px;
-  cursor: pointer;
+  color: white;
 }
 
-.btn-confirm-no {
-  background: #ccc;
-  color: var(--white);
-  border: none;
-  padding: 2px 8px;
-  border-radius: 4px;
-  cursor: pointer;
+.btn-confirm-no-small {
+  background: #e0e0e0;
+  color: #333;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+/* Animazione fadeIn specifica per la posizione in alto */
+@keyframes fadeInCross {
+  from { opacity: 0; transform: translateY(-10px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
 
 /* --- 10. MESSAGGI DI STATO --- */
 .empty-message {
@@ -339,13 +360,24 @@
 }
 
 .btn-vote {
-  background: var(--secondary-color);
-  border: 1px solid var(--primary-color);
-  padding: 4px 10px;
+  background: white;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
   border-radius: 20px;
   cursor: pointer;
-  font-size: 0.9rem;
+  transition: all 0.2s ease;
 }
+
+.btn-vote.active-like {
+  background-color: #d1ffd1 !important; /* Verde chiaro */
+  border: 2px solid green !important;
+}
+
+.btn-vote.active-dislike {
+  background-color: #ffd1d1 !important; /* Rosso chiaro */
+  border: 2px solid red !important;
+}
+
 
 .btn-vote:hover {
   background: var(--primary-color);
@@ -411,7 +443,7 @@
 }
 
 .comments-list {
-  max-height: 80px; /* Limita l'altezza per non allungare troppo la card */
+  max-height: 80px; 
   overflow-y: auto;
   padding: 8px;
 }
@@ -460,3 +492,39 @@
   height: auto; 
   min-height: 450px;
 }
+
+.single-comment {
+  border-bottom: 1px solid #f0f0f0;
+  padding: 8px 0;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.comment-date {
+  color: #888;
+  font-size: 0.65rem;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.btn-edit-small, .btn-delete-small {
+  background: none;
+  border: none;
+  font-size: 0.7rem;
+  color: #7a1b1b; /* Bordeaux del museo */
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.btn-delete-small { color: #d9534f; }

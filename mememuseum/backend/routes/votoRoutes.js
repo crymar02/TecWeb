@@ -2,29 +2,44 @@ import express from 'express';
 import { pool } from '../db.js';
 const router = express.Router();
 
-// POST: Inserisci o aggiorna un voto (Upsert)
+// CREA o AGGIORNA un voto (like/dislike)
 router.post('/', async (req, res) => {
-    const { meme_id, user_id, voto } = req.body; 
-
-    // Validazione base
-    if (!meme_id || !user_id || voto === undefined) {
-        return res.status(400).json({ error: "Dati mancanti (meme_id, user_id o voto)" });
-    }
-
+    const { meme_id, user_id, voto } = req.body;
     try {
-        const query = `
-            INSERT INTO voto (meme_id, user_id, voto) 
-            VALUES ($1, $2, $3)
-            ON CONFLICT (meme_id, user_id) 
-            DO UPDATE SET voto = EXCLUDED.voto, data_creazione_voto = CURRENT_TIMESTAMP
-            RETURNING *`;
-            
-        const result = await pool.query(query, [meme_id, user_id, voto]);
-        res.json(result.rows[0]);
+        //Controlliamo se esiste già un voto di questo utente su questo meme
+        const checkVoto = await pool.query(
+            'SELECT voto FROM voto WHERE meme_id = $1 AND user_id = $2',
+            [meme_id, user_id]
+        );
+
+        if (checkVoto.rows.length > 0) {
+            const votoEsistente = checkVoto.rows[0].voto;
+
+            if (votoEsistente === voto) {
+                // Se il voto è identico, lo CANCELLIAMO 
+                await pool.query(
+                    'DELETE FROM voto WHERE meme_id = $1 AND user_id = $2',
+                    [meme_id, user_id]
+                );
+                return res.json({ message: "Voto rimosso" });
+            } else {
+                // Se il voto è diverso (es. da like a dislike), lo AGGIORNIAMO
+                await pool.query(
+                    'UPDATE voto SET voto = $1 WHERE meme_id = $2 AND user_id = $3',
+                    [voto, meme_id, user_id]
+                );
+                return res.json({ message: "Voto aggiornato" });
+            }
+        } else {
+            // Se non esiste, lo CREIAMO
+            await pool.query(
+                'INSERT INTO voto (meme_id, user_id, voto) VALUES ($1, $2, $3)',
+                [meme_id, user_id, voto]
+            );
+            return res.status(201).json({ message: "Voto aggiunto" });
+        }
     } catch (err) {
-        console.error("Errore nel salvataggio del voto:", err.message);
-        res.status(500).json({ error: "Errore interno del server" });
+        res.status(500).json({ error: err.message });
     }
 });
-
 export default router;
