@@ -156,8 +156,19 @@ return (
               <div className="meme-interactions">
                 <div className="interaction-bar">
                   <div className="vote-section"> 
-                    <button onClick={() => handleVoto(meme.id_meme, true)} className={`btn-vote ${meme.voto_utente === true|| meme.voto_utente === 1 ? 'active-like' : ''}`} > 👍 {meme.likes} </button>
-                    <button  onClick={() => handleVoto(meme.id_meme, false)} className={`btn-vote ${meme.voto_utente === false || meme.voto_utente === 0? 'active-dislike' : ''}`} >  👎 {meme.dislikes} </button>
+                    <button 
+  onClick={() => handleVoto(meme.id_meme, true)} 
+  className={`btn-vote ${meme.voto_utente === true || meme.voto_utente === 1 ? 'active-like' : ''}`}
+>
+  <i className="fa-solid fa-thumbs-up"></i> {meme.likes}
+</button>
+
+<button  
+  onClick={() => handleVoto(meme.id_meme, false)} 
+  className={`btn-vote ${meme.voto_utente === false || meme.voto_utente === 0 ? 'active-dislike' : ''}`}
+>
+  <i className="fa-solid fa-thumbs-down"></i> {meme.dislikes}
+</button>
                   </div>
                   <button className="btn-show-comments" onClick={() => toggleCommenti(meme.id_meme)}>
                     💬 {meme.commenti?.length || 0}

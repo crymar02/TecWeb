@@ -31,7 +31,7 @@ function App() {
       <div className="App">
         <nav className="navbar">
           <div className="logo">
-            <Link to="/">🖼️ MEMEMUSEUM</Link>
+            <Link to="/"> MEMEMUSEUM</Link>
           </div>
           <div className="menu">
             <Link to="/" className="nav-link">Home</Link>

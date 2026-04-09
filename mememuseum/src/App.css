@@ -1,8 +1,8 @@
 /* --- 1. VARIABILI E BASE --- */
 :root {
-  --primary-color: #800208;   /* Bordeaux Museo */
-  --secondary-color: #F5F5DC; /* Crema Sfondo */
-  --accent-color: #ff0000;    /* Rosso Pulsanti */
+  --primary-color: #800208;   
+  --secondary-color: #b5d0ff; 
+  --accent-color: #ff0000;    
   --text-dark: #000000;
   --text-muted: #000000;
   --white: #ffffff;
@@ -37,9 +37,14 @@
 }
 
 .logo a {
-  font-size: 1.5rem;
+  font-size: 2.5rem;
+  font-style:italic, cursive;
   font-weight: bold;
-  color: var(--secondary-color);
+  color: #ffffff ;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-decoration: none;
 }
 
@@ -50,7 +55,7 @@
 }
 
 .nav-link {
-  color: var(--secondary-color);
+  color: #ffffff;
   text-decoration: none;
   transition: color 0.3s;
 }
@@ -196,12 +201,12 @@
 
 .create-card:hover {
   background-color: var(--white);
-  border-color: #8B4513; /* Colore legno/cornice */
+  border-color: #0c0500; /* Colore legno/cornice */
 }
 
 .plus-icon-wrapper {
   text-align: center;
-  color: #8B4513;
+  color: #0e0600;
 }
 
 .plus-icon {
