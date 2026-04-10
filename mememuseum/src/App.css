@@ -243,6 +243,24 @@
   border-color: var(--text-dark);
 }
 
+.meme-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+}
+
+.tag-badge {
+  background: #f0f2f5;
+  color: #65676b;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid #ddd;
+}
+
 .form-buttons {
   display: flex;
   gap: 10px;

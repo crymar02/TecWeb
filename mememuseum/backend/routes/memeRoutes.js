@@ -49,13 +49,28 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Upload Meme
+// Upload Meme 
 router.post('/upload', upload.single('immagine'), async (req, res) => {
     try {
-        const { titolo, descrizione, user_id } = req.body;
+        const { titolo, descrizione, user_id, tags } = req.body;
         const url_immagine = `http://localhost:3000/uploads/${req.file.filename}`;
-        const query = `INSERT INTO meme (titolo, descrizione, url_immagine, user_id) VALUES ($1, $2, $3, $4) RETURNING *`;
-        const result = await pool.query(query, [titolo, descrizione, url_immagine, parseInt(user_id)]);
+        
+        // Trasformiamo la stringa "tag1, tag2" in un array di stringhe pulite
+        const tagsArray = tags ? tags.split(',').map(t => t.trim()) : [];
+
+        const query = `
+            INSERT INTO meme (titolo, descrizione, url_immagine, user_id, tags) 
+            VALUES ($1, $2, $3, $4, $5) 
+            RETURNING *
+        `;
+        const result = await pool.query(query, [
+            titolo, 
+            descrizione, 
+            url_immagine, 
+            parseInt(user_id), 
+            tagsArray // PostgreSQL accetta array JS per colonne TEXT[]
+        ]);
+        
         res.status(201).json(result.rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });

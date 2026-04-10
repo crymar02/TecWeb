@@ -14,6 +14,7 @@ const Home = ({ isLoggedIn }) => {
   const [commentiAperti, setCommentiAperti] = useState({});
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [testoModifica, setTestoModifica] = useState("");
+  const [tags, setTags] = useState(""); 
 
  const fetchMemes = async () => {
     try {
@@ -33,27 +34,28 @@ const Home = ({ isLoggedIn }) => {
     setCommentiAperti(prev => ({ ...prev, [memeId]: !prev[memeId] }));
   };
 
-    const handleUpload = async (e) => {
-    e.preventDefault();
-    const userId = localStorage.getItem('userId');
-    const formData = new FormData();
-    formData.append('titolo', titolo);
-    formData.append('descrizione', descrizione);
-    formData.append('immagine', file);
-    formData.append('user_id', userId);
+const handleUpload = async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
+  formData.append('titolo', titolo);
+  formData.append('descrizione', descrizione);
+  formData.append('immagine', file);
+  formData.append('user_id', localStorage.getItem('userId'));
+  formData.append('tags', tags); 
 
-    try {
-      await axios.post('http://localhost:3000/api/memes/upload', formData);
-      alert("Meme pubblicato!");
-      setTitolo('');
-      setDescrizione('');
-      setFile(null);
-      setShowForm(false); 
-      fetchMemes();
-    } catch (err) {
-      alert("Errore upload");
-    }
-  };
+  try {
+    await axios.post('http://localhost:3000/api/memes/upload', formData);
+    // Reset campi e chiusura form
+    setTitolo("");
+    setDescrizione("");
+    setTags("");
+    setFile(null);
+    setShowForm(false);
+    fetchMemes();
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 const handleVoto = async (memeId, tipoVoto) => {
   if (!isLoggedIn) return alert("Esegui il login!");
@@ -98,6 +100,18 @@ const handleVoto = async (memeId, tipoVoto) => {
     } catch (err) { alert("Errore modifica"); }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/memes/${id}`, {
+        data: { user_id: localStorage.getItem('userId') }
+      });
+      setMemeDaEliminare(null);
+      fetchMemes();
+    } catch (err) {
+      alert("Errore durante l'eliminazione");
+    }
+  };
+
 return (
     <div className="home-container">
       <div className="museum-header">
@@ -120,6 +134,7 @@ return (
                 <input type="text" placeholder="Titolo..." value={titolo} onChange={(e) => setTitolo(e.target.value)} required />
                 <textarea placeholder="Descrizione..." value={descrizione} onChange={(e) => setDescrizione(e.target.value)} />
                 <input type="file" onChange={(e) => setFile(e.target.files[0])} required />
+                <input type="text" placeholder="Tags (separati da virgola)" value={tags} onChange={(e) => setTags(e.target.value)} />
                 <div className="form-buttons">
                   <button type="submit" className="btn-publish">Pubblica</button>
                   <button type="button" className="btn-cancel" onClick={() => setShowForm(false)}>Annulla</button>
@@ -152,23 +167,29 @@ return (
             <div className="meme-info">
               <h3>{meme.titolo}</h3>
               <p className="meme-description">{meme.descrizione}</p>
+              {/* Visualizzazione Tag */}
+            <div className="meme-tags">
+           {meme.tags && meme.tags.map((tag, index) => (
+           <span key={index} className="tag-badge">#{tag}</span>
+        ))}
+            </div>
 
               <div className="meme-interactions">
                 <div className="interaction-bar">
                   <div className="vote-section"> 
                     <button 
-  onClick={() => handleVoto(meme.id_meme, true)} 
-  className={`btn-vote ${meme.voto_utente === true || meme.voto_utente === 1 ? 'active-like' : ''}`}
->
-  <i className="fa-solid fa-thumbs-up"></i> {meme.likes}
-</button>
+                onClick={() => handleVoto(meme.id_meme, true)} 
+              className={`btn-vote ${meme.voto_utente === true || meme.voto_utente === 1 ? 'active-like' : ''}`}
+            >
+             <i className="fa-solid fa-thumbs-up"></i> {meme.likes}
+            </button>
 
-<button  
-  onClick={() => handleVoto(meme.id_meme, false)} 
-  className={`btn-vote ${meme.voto_utente === false || meme.voto_utente === 0 ? 'active-dislike' : ''}`}
->
-  <i className="fa-solid fa-thumbs-down"></i> {meme.dislikes}
-</button>
+            <button  
+           onClick={() => handleVoto(meme.id_meme, false)} 
+          className={`btn-vote ${meme.voto_utente === false || meme.voto_utente === 0 ? 'active-dislike' : ''}`}
+          >
+          <i className="fa-solid fa-thumbs-down"></i> {meme.dislikes}
+          </button>
                   </div>
                   <button className="btn-show-comments" onClick={() => toggleCommenti(meme.id_meme)}>
                     💬 {meme.commenti?.length || 0}
