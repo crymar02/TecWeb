@@ -10,39 +10,37 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// GET Meme (Aggiornata per includere il voto dell'utente loggato)
+// GET Meme 
 router.get('/', async (req, res) => {
-    const { userId } = req.query; // Recuperiamo l'ID utente passato dal frontend
+    const { userId, sortBy, page = 1 } = req.query;
+    const limit = 10; 
+    const offset = (page - 1) * limit;
 
     try {
-        const query = `
+        let query = `
             SELECT 
                 m.*, 
                 u.username,
                 (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,
                 (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = FALSE) AS dislikes,
-                -- Qui inseriamo la logica per il voto dell'utente attuale
                 (SELECT voto FROM voto v WHERE v.meme_id = m.id_meme AND v.user_id = $1) AS voto_utente,
-                COALESCE(
-                    (SELECT json_agg(json_build_object(
-                        'id_commento', c.id_commento,
-                        'contenuto', c.contenuto,
-                        'username', uc.username,
-                        'user_id', c.user_id,
-                        'data_creazione_commento', c.data_creazione_commento
-                    ) ORDER BY c.data_creazione_commento ASC)
-                     FROM commento c
-                     JOIN utente uc ON c.user_id = uc.user_id
-                     WHERE c.meme_id = m.id_meme
-                    ), '[]'
-                ) AS commenti
+                COUNT(*) OVER() AS total_count -- Ci dice quanti meme esistono in tutto per calcolare le pagine
             FROM meme m
             JOIN utente u ON m.user_id = u.user_id
-            ORDER BY m.data_creazione DESC;
+            WHERE 1=1
         `;
-        
-        // Se userId non c'è, passiamo null alla query
-        const result = await pool.query(query, [userId ? parseInt(userId) : null]);
+
+        const params = [userId ? parseInt(userId) : null];
+
+        // Ordinamento 
+        if (sortBy === 'popular') query += ` ORDER BY likes DESC`;
+        else if (sortBy === 'controversial') query += ` ORDER BY dislikes DESC`;
+        else query += ` ORDER BY m.data_creazione DESC`;
+
+        //LIMIT E OFFSET
+        query += ` LIMIT ${limit} OFFSET ${offset}`;
+
+        const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -54,8 +52,6 @@ router.post('/upload', upload.single('immagine'), async (req, res) => {
     try {
         const { titolo, descrizione, user_id, tags } = req.body;
         const url_immagine = `http://localhost:3000/uploads/${req.file.filename}`;
-        
-        // Trasformiamo la stringa "tag1, tag2" in un array di stringhe pulite
         const tagsArray = tags ? tags.split(',').map(t => t.trim()) : [];
 
         const query = `

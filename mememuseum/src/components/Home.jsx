@@ -15,20 +15,29 @@ const Home = ({ isLoggedIn }) => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [testoModifica, setTestoModifica] = useState("");
   const [tags, setTags] = useState(""); 
+  const [filtroTag, setFiltroTag] = useState("");
+  const [ordinamento, setOrdinamento] = useState("recent");
+  const [pagina, setPagina] = useState(1);
 
- const fetchMemes = async () => {
-    try {
-      const userId = localStorage.getItem('userId');
-      const res = await axios.get('http://localhost:3000/api/memes', {
-        params: { userId: userId }
-      });
-      setMemes(res.data);
-    } catch (err) { 
-      console.error("Errore fetch:", err); 
-    }
-  };
+const fetchMemes = async () => {
+  try {
+    const userId = localStorage.getItem('userId');
+    const res = await axios.get('http://localhost:3000/api/memes', {
+      params: { 
+        userId: userId,
+        sortBy: ordinamento,
+        page: pagina // <--- Invia la pagina corrente
+      }
+    });
+    setMemes(res.data);
+  } catch (err) { console.error(err); }
+};
 
-  useEffect(() => { fetchMemes(); }, []);
+
+useEffect(() => {
+  fetchMemes();
+  window.scrollTo(0, 0); 
+}, [pagina, ordinamento]);
 
   const toggleCommenti = (memeId) => {
     setCommentiAperti(prev => ({ ...prev, [memeId]: !prev[memeId] }));
@@ -41,7 +50,7 @@ const handleUpload = async (e) => {
   formData.append('descrizione', descrizione);
   formData.append('immagine', file);
   formData.append('user_id', localStorage.getItem('userId'));
-  formData.append('tags', tags); 
+  formData.append('tags', tags.toLocaleLowerCase()); 
 
   try {
     await axios.post('http://localhost:3000/api/memes/upload', formData);
@@ -112,13 +121,41 @@ const handleVoto = async (memeId, tipoVoto) => {
     }
   };
 
+const memesFiltrati = memes.filter(meme => {
+  const search = filtroTag.toLowerCase();
+  // Controlla nei tag (se esistono)
+  const neiTag = meme.tags?.some(t => t.toLowerCase().includes(search));
+  // Controlla nel titolo
+  const nelTitolo = meme.titolo.toLowerCase().includes(search);
+  
+  return neiTag || nelTitolo;
+});
 return (
     <div className="home-container">
       <div className="museum-header">
         <h1>{isLoggedIn ? `Bentornato, ${localStorage.getItem('username')}!` : "Benvenuto nel Mememuseum 🏛️"}</h1>
         <p>Esplora l'esposizione corrente o contribuisci con la tua arte.</p>
       </div>
-
+      <div className="search-section">
+  <div className="search-bar">
+    <input 
+      type="text" 
+      placeholder="Cerca per tag o titolo..." 
+      value={filtroTag}
+      onChange={(e) => setFiltroTag(e.target.value.toLowerCase())}
+    />
+    {filtroTag && <button onClick={() => setFiltroTag("")} className="btn-clear">×</button>}
+  </div>
+  
+  <div className="sort-options">
+    <label>Ordina per:</label>
+    <select value={ordinamento} onChange={(e) => setOrdinamento(e.target.value)}>
+      <option value="recent">Più Recenti</option>
+      <option value="popular">Più Votati (Upvoted)</option>
+      <option value="controversial">Meno Votati (Downvoted)</option>
+    </select>
+  </div>
+</div>
       <div className="gallery-grid">
         {/* Card Upload */}
         {isLoggedIn && (
@@ -144,7 +181,7 @@ return (
           </div>
         )}
 
-        {memes.map((meme) => (
+        {memesFiltrati.map((meme) => (
           <div key={meme.id_meme} className="meme-card">
             
             {/* Crocetta di eliminazione in alto a destra */}
@@ -262,9 +299,31 @@ return (
                   </div>
                 </div>
               </div>
+              
             </div>
           </div>
         ))}
+      </div>
+      <div className="site-pagination">
+        <div className="pagination-pill">
+          <button 
+            disabled={pagina === 1} 
+            onClick={() => { setPagina(pagina - 1); window.scrollTo(0,0); }}
+            className="nav-btn"
+          >
+            ← Precedente
+          </button>
+
+          <span className="current-page">Pagina {pagina}</span>
+
+          <button 
+            disabled={memes.length < 10} 
+            onClick={() => { setPagina(pagina + 1); window.scrollTo(0,0); }}
+            className="nav-btn"
+          >
+            Successiva →
+          </button>
+        </div>
       </div>
     </div>
   );
