@@ -12,40 +12,65 @@ const upload = multer({ storage: storage });
 
 // GET Meme 
 router.get('/', async (req, res) => {
-    const { userId, sortBy, page = 1 } = req.query;
+    const { userId, sortBy, page = 1, filtroTag = "" } = req.query;
     const limit = 10; 
     const offset = (page - 1) * limit;
 
     try {
-        let query = `
-            SELECT 
-                m.*, 
-                u.username,
-                (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,
-                (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = FALSE) AS dislikes,
-                (SELECT voto FROM voto v WHERE v.meme_id = m.id_meme AND v.user_id = $1) AS voto_utente,
-                COUNT(*) OVER() AS total_count -- Ci dice quanti meme esistono in tutto per calcolare le pagine
-            FROM meme m
-            JOIN utente u ON m.user_id = u.user_id
-            WHERE 1=1
-        `;
+        const searchTerm = `%${filtroTag}%`;
 
-        const params = [userId ? parseInt(userId) : null];
+let query = `
+    SELECT 
+        m.*, 
+        u.username,
+        (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,
+        (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = FALSE) AS dislikes,
+        (SELECT voto FROM voto v WHERE v.meme_id = m.id_meme AND v.user_id = $1) AS voto_utente,
+        (SELECT COALESCE(JSON_AGG(json_build_object(
+            'id_commento', c.id_commento,
+            'username', cu.username,
+            'contenuto', c.contenuto,
+            'user_id', c.user_id,
+            'data_creazione_commento', c.data_creazione_commento
+        )), '[]') 
+         FROM commento c 
+         JOIN utente cu ON c.user_id = cu.user_id 
+         WHERE c.meme_id = m.id_meme) AS commenti,
+        COUNT(*) OVER() AS total_count
+    FROM meme m
+    JOIN utente u ON m.user_id = u.user_id
+    WHERE (
+        m.titolo ILIKE $2 
+        OR EXISTS (
+            SELECT 1 FROM unnest(m.tags) AS t 
+            WHERE t ILIKE $2
+        )
+    )
+    GROUP BY m.id_meme, u.username
+`;
+
+        // $1 è userId, $2 è il termine di ricerca
+        const params = [
+            userId ? parseInt(userId) : null, 
+            searchTerm
+        ];
 
         // Ordinamento 
         if (sortBy === 'popular') query += ` ORDER BY likes DESC`;
         else if (sortBy === 'controversial') query += ` ORDER BY dislikes DESC`;
         else query += ` ORDER BY m.data_creazione DESC`;
 
-        //LIMIT E OFFSET
+        // LIMIT E OFFSET
         query += ` LIMIT ${limit} OFFSET ${offset}`;
 
         const result = await pool.query(query, params);
         res.json(result.rows);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: err.message });
     }
 });
+       
 
 // Upload Meme 
 router.post('/upload', upload.single('immagine'), async (req, res) => {
@@ -81,6 +106,28 @@ router.delete('/:id', async (req, res) => {
         const result = await pool.query('DELETE FROM meme WHERE id_meme = $1 AND user_id = $2 RETURNING *', [id, user_id]);
         if (result.rows.length === 0) return res.status(403).json({ error: "Non autorizzato" });
         res.json({ message: "Eliminato" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Rotta per modificare il titolo del meme
+router.put('/:id/titolo', async (req, res) => {
+    const { id } = req.params;
+    const { titolo, user_id } = req.body;
+
+    try {
+        // Controlliamo che chi modifica sia l'effettivo proprietario
+        const result = await pool.query(
+            'UPDATE meme SET titolo = $1 WHERE id_meme = $2 AND user_id = $3 RETURNING *',
+            [titolo, id, user_id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(403).json({ error: "Non autorizzato o meme non trovato" });
+        }
+
+        res.json(result.rows[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

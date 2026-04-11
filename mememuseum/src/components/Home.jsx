@@ -18,6 +18,8 @@ const Home = ({ isLoggedIn }) => {
   const [filtroTag, setFiltroTag] = useState("");
   const [ordinamento, setOrdinamento] = useState("recent");
   const [pagina, setPagina] = useState(1);
+  const [editingMemeId, setEditingMemeId] = useState(null);
+  const [nuovoTitolo, setNuovoTitolo] = useState(""); 
 
 const fetchMemes = async () => {
   try {
@@ -26,7 +28,8 @@ const fetchMemes = async () => {
       params: { 
         userId: userId,
         sortBy: ordinamento,
-        page: pagina // <--- Invia la pagina corrente
+        page: pagina,
+        filtroTag: filtroTag
       }
     });
     setMemes(res.data);
@@ -36,8 +39,10 @@ const fetchMemes = async () => {
 
 useEffect(() => {
   fetchMemes();
+   setCommentiAperti({});
   window.scrollTo(0, 0); 
-}, [pagina, ordinamento]);
+}, [pagina, ordinamento, filtroTag]);
+
 
   const toggleCommenti = (memeId) => {
     setCommentiAperti(prev => ({ ...prev, [memeId]: !prev[memeId] }));
@@ -121,6 +126,20 @@ const handleVoto = async (memeId, tipoVoto) => {
     }
   };
 
+  const handleSalvaTitolo = async (memeId) => {
+  try {
+    const userId = localStorage.getItem('userId');
+    await axios.put(`http://localhost:3000/api/memes/${memeId}/titolo`, {
+      titolo: nuovoTitolo,
+      user_id: userId
+    });
+    setEditingMemeId(null);
+    fetchMemes(); // Rinfresca la lista
+  } catch (err) {
+    console.error("Errore modifica titolo:", err);
+  }
+};
+
 const memesFiltrati = memes.filter(meme => {
   const search = filtroTag.toLowerCase();
   // Controlla nei tag (se esistono)
@@ -138,12 +157,15 @@ return (
       </div>
       <div className="search-section">
   <div className="search-bar">
-    <input 
-      type="text" 
-      placeholder="Cerca per tag o titolo..." 
-      value={filtroTag}
-      onChange={(e) => setFiltroTag(e.target.value.toLowerCase())}
-    />
+   <input 
+  type="text" 
+  placeholder="Cerca per tag o titolo..." 
+  value={filtroTag}
+  onChange={(e) => {
+    setFiltroTag(e.target.value.toLowerCase());
+    setPagina(1); 
+  }}
+/>
     {filtroTag && <button onClick={() => setFiltroTag("")} className="btn-clear">×</button>}
   </div>
   
@@ -152,7 +174,7 @@ return (
     <select value={ordinamento} onChange={(e) => setOrdinamento(e.target.value)}>
       <option value="recent">Più Recenti</option>
       <option value="popular">Più Votati (Upvoted)</option>
-      <option value="controversial">Meno Votati (Downvoted)</option>
+      <option value="controversial">Meno votati (Downvoted)</option>
     </select>
   </div>
 </div>
@@ -181,7 +203,7 @@ return (
           </div>
         )}
 
-        {memesFiltrati.map((meme) => (
+        {memes.map((meme) => (
           <div key={meme.id_meme} className="meme-card">
             
             {/* Crocetta di eliminazione in alto a destra */}
@@ -202,7 +224,34 @@ return (
             <img src={meme.url_immagine} alt={meme.titolo} className="meme-img" />
             
             <div className="meme-info">
-              <h3>{meme.titolo}</h3>
+  <div className="meme-header">
+  {editingMemeId === meme.id_meme ? (
+    <div className="edit-title-container">
+      <input 
+        value={nuovoTitolo} 
+        onChange={(e) => setNuovoTitolo(e.target.value)}
+        className="edit-title-input"
+        autoFocus
+      />
+      <div className="edit-actions">
+        <button onClick={() => handleSalvaTitolo(meme.id_meme)} className="btn-edit-small">Salva</button>
+        <span className="button-spacer"> </span>
+        <button onClick={() => setEditingMemeId(null)} className="btn-edit-small">Annulla</button>
+      </div>
+    </div>
+  ) : (
+    <h3 className="title-with-icon">
+      {meme.titolo}
+      {isLoggedIn && parseInt(localStorage.getItem('userId')) === meme.user_id && (
+        <i 
+          className="fa-solid fa-pen btn-edit-icon" 
+          onClick={() => { setEditingMemeId(meme.id_meme); setNuovoTitolo(meme.titolo); }}
+          title="Modifica titolo"
+        ></i>
+      )}
+    </h3>
+  )}
+</div>
               <p className="meme-description">{meme.descrizione}</p>
               {/* Visualizzazione Tag */}
             <div className="meme-tags">
@@ -295,7 +344,8 @@ return (
                 <div className="meme-meta">
                   <div>
                     <span className="author">Autore: <strong>{meme.username}</strong></span>
-                    <span className="meme-date">{new Date(meme.data_creazione).toLocaleDateString('it-IT')}</span>
+                    <span className="meme-date">{new Date(meme.data_creazione).toLocaleDateString('it-IT')} ore {new Date(meme.data_creazione).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</span>
+              
                   </div>
                 </div>
               </div>
@@ -326,6 +376,7 @@ return (
         </div>
       </div>
     </div>
+    
   );
 };
 
