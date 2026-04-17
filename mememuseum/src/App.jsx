@@ -5,6 +5,7 @@ import './App.css';
 import Home from './components/Home.jsx';
 import Login from './components/Auth/Login.jsx';
 import Signup from './components/Auth/Signup.jsx';
+import MemeDelGiorno from './components/MemeDelGiorno.jsx';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -35,6 +36,7 @@ function App() {
           </div>
           <div className="menu">
             <Link to="/" className="nav-link">Home</Link>
+            <Link to="/meme-del-giorno" className="nav-link">Meme del Giorno</Link>
             {!isLoggedIn ? (
               <>
                 <Link to="/login" className="nav-link">Login</Link>
@@ -52,6 +54,7 @@ function App() {
             <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
             <Route path="/login" element={<Login onLoginSuccess={checkLoginStatus} />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/meme-del-giorno" element={<MemeDelGiorno isLoggedIn={isLoggedIn} />} />
           </Routes>
         </div>
       </div>

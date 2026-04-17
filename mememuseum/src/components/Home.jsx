@@ -149,6 +149,7 @@ const memesFiltrati = memes.filter(meme => {
   
   return neiTag || nelTitolo;
 });
+
 return (
     <div className="home-container">
       <div className="museum-header">

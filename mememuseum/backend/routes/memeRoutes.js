@@ -133,4 +133,39 @@ router.put('/:id/titolo', async (req, res) => {
     }
 });
 
+// Rotta per il Meme del Giorno
+router.get('/del-giorno', async (req, res) => {
+    try {
+        // 1. Contiamo quanti meme totali ci sono
+        const countRes = await pool.query('SELECT COUNT(*) FROM meme');
+        const totalMemes = parseInt(countRes.rows[0].count);
+
+        if (totalMemes === 0) return res.status(404).json({ error: "Nessun meme in archivio" });
+
+        // 2. Algoritmo di rotazione semplice: (Giorno dell'anno) % (Totale Meme)
+        const oggi = new Date();
+        const inizioAnno = new Date(oggi.getFullYear(), 0, 0);
+        const diff = oggi - inizioAnno;
+        const giornoDellAnno = Math.floor(diff / (1000 * 60 * 60 * 24));
+        
+        const offset = giornoDellAnno % totalMemes;
+
+        // 3. Recuperiamo il meme a quell'indice con i dati necessari (like, commenti, autore)
+        const query = `
+            SELECT m.*, u.username,
+            (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,
+            (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = FALSE) AS dislikes
+            
+            FROM meme m
+            JOIN utente u ON m.user_id = u.user_id
+            LIMIT 1 OFFSET $1
+        `;
+        
+        const result = await pool.query(query, [offset]);
+        res.json(result.rows[0]);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 export default router;
