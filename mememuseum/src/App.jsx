@@ -33,6 +33,7 @@ function App() {
       <div className="App">
         <nav className="navbar">
           <div className="logo">
+            <img src="/logomememuseum.png" className="navbar-logo" />
             <Link to="/"> MEMEMUSEUM</Link>
           </div>
           <div className="menu">
