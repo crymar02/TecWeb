@@ -20,20 +20,35 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--secondary-color);
   min-height: 100vh;
+  padding-top: 100px;
 }
 
-/* --- 2. LAYOUT E NAVIGAZIONE --- */
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--secondary-color);
+  color: var(--text-dark);
+  line-height: 1.6;
+}
+
+/* --- 2. LAYOUT E NAVIGAZIONE (Sostituisci questa parte) --- */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 0 2rem;
   background-color: var(--primary-color);
-  color: var(--secondary-color);
-  position: sticky;
+  color: var(--white);
+  position: fixed; /* Fixed è più affidabile di sticky in questo caso */
   top: 0;
-  z-index: 1000;
+  left: 0;
+  width: 100%;
+  height: 70px; /* Altezza fissa garantita */
+  z-index: 2000; /* Molto alto per stare sopra a tutto */
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.App {
+  padding-top: 90px !important; 
 }
 
 .logo a {
@@ -94,7 +109,8 @@
 
 .museum-header {
   text-align: center;
-  margin: 40px 0;
+  margin-top: 20px;
+  margin-bottom: 30px;
 }
 
 .gallery-grid {
@@ -128,6 +144,7 @@
   width: 100%;
   height: 250px;
   object-fit: cover;
+  display: block;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -777,4 +794,55 @@
     margin-top: 1.5rem;
     font-size: 0.9rem;
     color: #555;
+}
+
+/* --- FIX PER MOBILE AGGIORNATO --- */
+
+@media (max-width: 768px) {
+  .App {
+    padding-top: 220px !important; 
+  }
+  .navbar {
+    display: flex !important;
+    flex-direction: column !important; 
+    height: auto !important;
+    padding-top: 10px !important;    /* Spazio sopra il logo */
+    padding-bottom: 35px !important; /* Spazio extra SOTTO i tasti */
+    gap: 75px !important;            /* Spazio ENORME tra Logo e Tasti */
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    align-items: center !important;
+  }
+
+  /* 3. Il Logo (posizionato in alto) */
+  .logo {
+    width: 100% !important;
+    text-align: center !important;
+    margin: 0 !important;
+    padding-top: 10px !important;
+  }
+
+  .logo a {
+    font-size: 1.8rem !important;
+    display: block;
+    text-transform: uppercase;
+  }
+
+  /* 4. Il Menu (posizionato in basso) */
+  .menu {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important; 
+    justify-content: center !important;
+    gap: 12px !important; 
+    margin: 0 !important; 
+  }
+
+  .nav-link, .btn-logout {
+    font-size: 0.9rem !important;
+    padding: 10px 12px !important;
+    border-radius: 6px !important;
+  }
 }
