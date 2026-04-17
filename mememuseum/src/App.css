@@ -335,7 +335,7 @@ body {
 }
 
 .btn-delete-cross:hover {
-  background: #ff4d4d; /* Diventa rossa al passaggio del mouse */
+  background: var(--primary-color); /* Diventa rossa al passaggio del mouse */
   color: white;
   transform: scale(1.1);
 }
@@ -343,7 +343,7 @@ body {
 /* Stile per il Box di Conferma in alto (più compatto) */
 .confirm-box-top {
   background: white;
-  border: 1px solid #ff4d4d;
+  border: 1px solid #ff0000;
   padding: 5px 10px;
   border-radius: 20px; /* Bordi molto arrotondati */
   display: flex;
@@ -370,7 +370,7 @@ body {
 }
 
 .btn-confirm-yes-small {
-  background: #ff4d4d;
+  background: #ff0000;
   color: white;
 }
 
@@ -472,13 +472,28 @@ body {
   margin-bottom: 5px;
 }
 
+/* Stile base del pulsante commenti */
 .btn-show-comments {
   background: none;
   border: none;
-  color: var(--primary-color);
-  font-size: 0.8rem;
+  color: #000000; /* Nero di base */
+  font-size: 0.9rem;
   font-weight: bold;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Spazio tra icona e numero */
+  transition: color 0.3s ease; /* Rende il cambio colore fluido */
+}
+
+/* Effetto al passaggio del mouse (Hover) */
+.btn-show-comments:hover {
+  color: var(--primary-color); /* Diventa bordeaux */
+}
+
+/* Se vuoi che anche l'icona interna segua il colore */
+.btn-show-comments i {
+  font-size: 1.1rem;
 }
 
 .comments-dropdown {

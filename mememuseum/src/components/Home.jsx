@@ -35,7 +35,7 @@ const fetchMemes = async () => {
           userId: userId,
           sortBy: ordinamento, 
           page: pagina, 
-          filtroTag: filtroTag // Deve corrispondere al nome usato nel backend
+          filtroTag: filtroTag 
         }
       });
 
@@ -318,7 +318,7 @@ return (
           </button>
                   </div>
                   <button className="btn-show-comments" onClick={() => toggleCommenti(meme.id_meme)}>
-                    💬 {meme.commenti?.length || 0}
+                  <i className="fa-solid fa-comment"></i> {meme.commenti?.length || 0}
                   </button>
                 </div>
 

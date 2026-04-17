@@ -41,6 +41,7 @@ const Auth = ({ onLoginSuccess }) => {
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('username', res.data.user.username);
                 localStorage.setItem('userId', res.data.user.id);
+                toast.success("Login effettuato con successo!")
                 onLoginSuccess();
                 navigate('/');
             } else {
