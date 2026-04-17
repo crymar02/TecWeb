@@ -56,9 +56,15 @@ let query = `
         ];
 
         // Ordinamento 
-        if (sortBy === 'popular') query += ` ORDER BY likes DESC`;
-        else if (sortBy === 'controversial') query += ` ORDER BY dislikes DESC`;
-        else query += ` ORDER BY m.data_creazione DESC`;
+        if (sortBy === 'popular') {
+        query += ` ORDER BY likes DESC`;
+        } else if (sortBy === 'controversial') {
+        query += ` ORDER BY dislikes DESC`;
+        } else if (sortBy === 'oldest') {
+         query += ` ORDER BY m.data_creazione ASC`; 
+        } else {
+       query += ` ORDER BY m.data_creazione DESC`;
+    }
 
         // LIMIT E OFFSET
         query += ` LIMIT ${limit} OFFSET ${offset}`;

@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 const Home = ({ isLoggedIn }) => {
   const navigate = useNavigate();
   const [memes, setMemes] = useState([]);
+  const [totalMemes, setTotalMemes] = useState(0);
   const [showForm, setShowForm] = useState(false); 
   const [memeDaEliminare, setMemeDaEliminare] = useState(null);
   const [titolo, setTitolo] = useState('');
@@ -25,19 +26,42 @@ const Home = ({ isLoggedIn }) => {
 
 
 const fetchMemes = async () => {
-  try {
-    const userId = localStorage.getItem('userId');
-    const res = await axios.get('http://localhost:3000/api/memes', {
-      params: { 
-        userId: userId,
-        sortBy: ordinamento,
-        page: pagina,
-        filtroTag: filtroTag
+    try {
+      const userId = localStorage.getItem('userId');
+      
+      const res = await axios.get('http://localhost:3000/api/memes', {
+        params: { 
+          userId: userId,
+          sortBy: ordinamento, 
+          page: pagina, 
+          filtroTag: filtroTag // Deve corrispondere al nome usato nel backend
+        }
+      });
+
+      // Verifichiamo che i dati siano un array
+      if (res.data && Array.isArray(res.data)) {
+        setMemes(res.data);
+        
+        // Recuperiamo il conteggio totale dal primo elemento (se esiste)
+        if (res.data.length > 0 && res.data[0].total_count) {
+          setTotalMemes(parseInt(res.data[0].total_count));
+        } else {
+          setTotalMemes(0);
+        }
+      } else {
+        setMemes([]);
+        setTotalMemes(0);
       }
-    });
-    setMemes(res.data);
-  } catch (err) { console.error(err); }
-};
+    } catch (err) {
+      console.error("Errore durante il caricamento dei meme:", err);
+      setMemes([]);
+      setTotalMemes(0);
+    }
+  };
+
+  useEffect(() => {
+    fetchMemes();
+  }, [ordinamento, pagina, filtroTag]);
 
 
 useEffect(() => {
@@ -165,15 +189,6 @@ const handleVoto = async (memeId, tipoVoto) => {
   }
 };
 
-const memesFiltrati = memes.filter(meme => {
-  const search = filtroTag.toLowerCase();
-  // Controlla nei tag (se esistono)
-  const neiTag = meme.tags?.some(t => t.toLowerCase().includes(search));
-  // Controlla nel titolo
-  const nelTitolo = meme.titolo.toLowerCase().includes(search);
-  
-  return neiTag || nelTitolo;
-});
 
 return (
     <div className="home-container">
@@ -199,6 +214,7 @@ return (
     <label>Ordina per:</label>
     <select value={ordinamento} onChange={(e) => setOrdinamento(e.target.value)}>
       <option value="recent">Più Recenti</option>
+      <option value="oldest">Meno Recenti</option>
       <option value="popular">Più Votati (Upvoted)</option>
       <option value="controversial">Meno votati (Downvoted)</option>
     </select>
@@ -379,22 +395,23 @@ return (
             </div>
           </div>
         ))}
-      </div>
+        </div>
+     {/* Sezione Paginazione fuori dalla griglia */}
       <div className="site-pagination">
         <div className="pagination-pill">
           <button 
             disabled={pagina === 1} 
-            onClick={() => { setPagina(pagina - 1); window.scrollTo(0,0); }}
+            onClick={() => { setPagina(pagina - 1); window.scrollTo(0, 0); }}
             className="nav-btn"
           >
             ← Precedente
           </button>
-
+          
           <span className="current-page">Pagina {pagina}</span>
 
           <button 
-            disabled={memes.length < 10} 
-            onClick={() => { setPagina(pagina + 1); window.scrollTo(0,0); }}
+            disabled={pagina * 10 >= totalMemes} 
+            onClick={() => { setPagina(pagina + 1); window.scrollTo(0, 0); }}
             className="nav-btn"
           >
             Successiva →
@@ -402,7 +419,6 @@ return (
         </div>
       </div>
     </div>
-    
   );
 };
 
