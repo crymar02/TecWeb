@@ -24,6 +24,7 @@ const Home = ({ isLoggedIn }) => {
   const [editingMemeId, setEditingMemeId] = useState(null);
   const [nuovoTitolo, setNuovoTitolo] = useState(""); 
   const location = useLocation();
+  const [commentoDaEliminare, setCommentoDaEliminare] = useState(null);
 
 
 const fetchMemes = async () => {
@@ -138,15 +139,19 @@ const handleVoto = async (memeId, tipoVoto) => {
     } catch (err) { console.error(err); }
   };
 
-  const handleEliminaCommento = async (id) => {
-    if (!window.confirm("Eliminare il commento?")) return;
-    try {
-      await axios.delete(`http://localhost:3000/api/commenti/${id}`, {
-        data: { user_id: localStorage.getItem('userId') }
-      });
-      fetchMemes();
-    } catch (err) { console.error(err); }
-  };
+const handleEliminaCommento = async (id) => {
+  try {
+    await axios.delete(`http://localhost:3000/api/commenti/${id}`, {
+      data: { user_id: localStorage.getItem('userId') }
+    });
+    setCommentoDaEliminare(null); 
+    fetchMemes();
+    toast.success("Commento eliminato");
+  } catch (err) { 
+    console.error(err); 
+    toast.error("Errore nell'eliminazione");
+  }
+};
 
   const handleSalvaModifica = async (commentoId) => {
     try {
