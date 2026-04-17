@@ -21,13 +21,15 @@ const Signup = () => {
     };
 
     return (
+        <div className="auth-container">
+            <div className="auth-card">
+              <h2>Registrati</h2>
         <form onSubmit={handleSubmit}>
-            <h2>Registrati al Mememuseum</h2>
             <input 
                 type="text" 
                 name="nome" 
                 placeholder="Nome" 
-                value={formData.nome} // <--- Collega lo stato
+                value={formData.nome} 
                 onChange={handleChange} 
                 required 
             />
@@ -70,6 +72,8 @@ const Signup = () => {
             
             <button type="submit">Iscriviti</button>
         </form>
+            </div>
+        </div>
     );
 };
 

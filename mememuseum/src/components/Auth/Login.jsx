@@ -31,13 +31,18 @@ const Login = ({ onLoginSuccess }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>Login</h2>
-            <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-            <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
-            <button type="submit">Entra</button>
-        </form>
+        <div className="auth-container">
+            <div className="auth-card">
+              <h2>Accedi</h2>
+                <form onSubmit={handleSubmit}>
+                    <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
+                    <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+                   <button type="submit" className="btn-auth">Login</button>
+                </form>
+            </div>
+        </div>
     );
 };
 
 export default Login;
+       

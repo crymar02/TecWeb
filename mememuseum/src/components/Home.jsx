@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 const Home = ({ isLoggedIn }) => {
   const navigate = useNavigate();
@@ -20,6 +21,8 @@ const Home = ({ isLoggedIn }) => {
   const [pagina, setPagina] = useState(1);
   const [editingMemeId, setEditingMemeId] = useState(null);
   const [nuovoTitolo, setNuovoTitolo] = useState(""); 
+  const location = useLocation();
+
 
 const fetchMemes = async () => {
   try {
@@ -43,6 +46,28 @@ useEffect(() => {
   window.scrollTo(0, 0); 
 }, [pagina, ordinamento, filtroTag]);
 
+useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const highlightId = params.get('highlight');
+
+    if (highlightId && memes.length > 0) {
+      setTimeout(() => {
+        const element = document.getElementById(`meme-${highlightId}`);
+        if (element) {
+          // Scroll fluido
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          
+          // Aggiungiamo la classe per l'evidenziazione
+          element.classList.add('highlight-red');
+          
+          // La rimuoviamo dopo 3 secondi
+          setTimeout(() => {
+            element.classList.remove('highlight-red');
+          }, 3000);
+        }
+      }, 500); // Ritardo per permettere il rendering dei meme
+    }
+  }, [memes, location.search]);
 
   const toggleCommenti = (memeId) => {
     setCommentiAperti(prev => ({ ...prev, [memeId]: !prev[memeId] }));
@@ -205,7 +230,7 @@ return (
         )}
 
         {memes.map((meme) => (
-          <div key={meme.id_meme} className="meme-card">
+          <div key={meme.id_meme} id={`meme-${meme.id_meme}`} className="meme-card">
             
             {/* Crocetta di eliminazione in alto a destra */}
             {isLoggedIn && parseInt(localStorage.getItem('userId')) === meme.user_id && (

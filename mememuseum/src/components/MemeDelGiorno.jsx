@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const MemeDelGiorno = () => {
   const [meme, setMeme] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMemeDelGiorno = async () => {
       try {
-        // Recuperiamo il meme dal backend
         const res = await axios.get('http://localhost:3000/api/memes/del-giorno');
         setMeme(res.data);
       } catch (err) {
@@ -19,6 +20,11 @@ const MemeDelGiorno = () => {
 
   if (!meme) return <div className="loading">Caricamento dell'opera del giorno...</div>;
 
+  // Funzione per navigare alla home passando l'ID specifico
+  const vaiAlMemeInHome = () => {
+    navigate(`/?highlight=${meme.id_meme}`);
+  };
+
   return (
     <div className="home-container">
       <div className="museum-header">
@@ -26,10 +32,7 @@ const MemeDelGiorno = () => {
         <p>Un capolavoro selezionato per questo {new Date().toLocaleDateString('it-IT')}</p>
       </div>
 
-      {/* Container per centrare la card */}
       <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
-        
-        {/* Usiamo la stessa classe 'meme-card' della Home */}
         <div className="meme-card" style={{ margin: 0 }}>
           <img src={meme.url_immagine} alt={meme.titolo} className="meme-img" />
           
@@ -40,31 +43,17 @@ const MemeDelGiorno = () => {
             
             <p className="meme-description">{meme.descrizione}</p>
 
-            <div className="meme-tags">
-              {meme.tags && meme.tags.map((tag, index) => (
-                <span key={index} className="tag-badge">#{tag}</span>
-              ))}
-            </div>
-
-            <div className="meme-interactions">
-              <div className="interaction-bar">
-                <div className="vote-section">
-                  <button className="btn-vote">
-                    <i className="fa-solid fa-thumbs-up"></i> {meme.likes}
-                  </button>
-                  <button className="btn-vote">
-                    <i className="fa-solid fa-thumbs-down"></i> {meme.dislikes}
-                  </button>
-                </div>
-              </div>
-            </div>
-
             <div className="meme-footer">
               <div className="meme-meta">
                 <span className="author">Autore: <strong>{meme.username}</strong></span>
-                <span className="meme-date">
-                  {new Date(meme.data_creazione).toLocaleDateString('it-IT')}
-                </span>
+                
+                <button 
+                  onClick={vaiAlMemeInHome}
+                  className="btn-publish" 
+                  style={{ marginTop: '15px', cursor: 'pointer', width: '100%' }}
+                >
+                  Mostra ulteriori dettagli ➔
+                </button>
               </div>
             </div>
           </div>
