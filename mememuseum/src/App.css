@@ -583,7 +583,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
+  background: var(--primary-color);
   padding: 15px 20px;
   border-radius: 12px;
   margin-bottom: 25px;
@@ -605,6 +605,12 @@ body {
   border-radius: 8px;
   font-size: 1rem;
 }
+
+.sort-options label {
+  color: white; 
+  font-weight: bold;          
+  margin-right: 5px;          
+} 
 
 .tag-badge {
   text-transform: capitalize; 
@@ -816,8 +822,8 @@ body {
     flex-direction: column !important; 
     height: auto !important;
     padding-top: 10px !important;    /* Spazio sopra il logo */
-    padding-bottom: 35px !important; /* Spazio extra SOTTO i tasti */
-    gap: 75px !important;            /* Spazio ENORME tra Logo e Tasti */
+    padding-bottom: 10px !important; /* Spazio extra SOTTO i tasti */
+    gap: 60x !important;            /* Spazio ENORME tra Logo e Tasti */
     position: fixed !important;
     top: 0;
     left: 0;
