@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const Home = ({ isLoggedIn }) => {
   const navigate = useNavigate();
@@ -78,18 +79,13 @@ useEffect(() => {
       setTimeout(() => {
         const element = document.getElementById(`meme-${highlightId}`);
         if (element) {
-          // Scroll fluido
           element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          
-          // Aggiungiamo la classe per l'evidenziazione
           element.classList.add('highlight-red');
-          
-          // La rimuoviamo dopo 3 secondi
           setTimeout(() => {
             element.classList.remove('highlight-red');
           }, 3000);
         }
-      }, 500); // Ritardo per permettere il rendering dei meme
+      }, 500); 
     }
   }, [memes, location.search]);
 
@@ -108,7 +104,6 @@ const handleUpload = async (e) => {
 
   try {
     await axios.post('http://localhost:3000/api/memes/upload', formData);
-    // Reset campi e chiusura form
     setTitolo("");
     setDescrizione("");
     setTags("");
@@ -121,7 +116,7 @@ const handleUpload = async (e) => {
 };
 
 const handleVoto = async (memeId, tipoVoto) => {
-  if (!isLoggedIn) return alert("Esegui il login!");
+  if (!isLoggedIn) return toast.warn("Devi effettuare il login per votare!");
   try {
     await axios.post('http://localhost:3000/api/voti', {
       meme_id: memeId, 
@@ -129,7 +124,7 @@ const handleVoto = async (memeId, tipoVoto) => {
       voto: tipoVoto
     });
     fetchMemes(); 
-  } catch (err) { console.error(err); }
+  } catch (err) { toast.error("Impossibile registrare il voto"); }
 };
   const handleInviaCommento = async (memeId) => {
     const contenuto = commentiTesto[memeId];
@@ -159,8 +154,9 @@ const handleVoto = async (memeId, tipoVoto) => {
         user_id: localStorage.getItem('userId'), nuovoContenuto: testoModifica
       });
       setEditingCommentId(null);
+      toast.success("Commento aggiornato con successo!");
       fetchMemes();
-    } catch (err) { alert("Errore modifica"); }
+    } catch (err) { toast.error("Errore durante la modifica del commento"); }
   };
 
   const handleDelete = async (id) => {
@@ -169,9 +165,10 @@ const handleVoto = async (memeId, tipoVoto) => {
         data: { user_id: localStorage.getItem('userId') }
       });
       setMemeDaEliminare(null);
+      toast.success("Opera rimossa dal museo.");
       fetchMemes();
     } catch (err) {
-      alert("Errore durante l'eliminazione");
+      toast.error("Non è stato possibile eliminare l'opera");
     }
   };
 
@@ -183,9 +180,10 @@ const handleVoto = async (memeId, tipoVoto) => {
       user_id: userId
     });
     setEditingMemeId(null);
-    fetchMemes(); // Rinfresca la lista
+    toast.success("Titolo aggiornato con successo!");
+    fetchMemes(); 
   } catch (err) {
-    console.error("Errore modifica titolo:", err);
+    toast.error("Errore nel salvataggio del titolo");
   }
 };
 
@@ -193,7 +191,7 @@ const handleVoto = async (memeId, tipoVoto) => {
 return (
     <div className="home-container">
       <div className="museum-header">
-        <h1>{isLoggedIn ? `Bentornato, ${localStorage.getItem('username')}!` : "Benvenuto nel Mememuseum 🏛️"}</h1>
+        <h1>{isLoggedIn ? `Bentornato, ${localStorage.getItem('username')}!` : "Benvenuto nel Mememuseum"}</h1>
         <p>Esplora l'esposizione corrente o contribuisci con la tua arte.</p>
       </div>
       <div className="search-section">

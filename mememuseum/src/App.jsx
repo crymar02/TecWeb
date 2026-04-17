@@ -1,6 +1,8 @@
 // App.jsx
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css'; 
 import Home from './components/Home.jsx';
 import Auth from './components/Auth.jsx';
@@ -53,8 +55,10 @@ function App() {
           <Route path="/meme-del-giorno" element={<MemeDelGiorno />} />
         </Routes>
         </div>
+        <ToastContainer position="bottom-right" theme="colored" />
       </div>
     </Router>
+    
   );
 }
 

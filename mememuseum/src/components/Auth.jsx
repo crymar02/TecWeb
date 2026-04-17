@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+
+const initialState = {
+    nome: '', 
+    cognome: '', 
+    username: '', 
+    email: '', 
+    password: ''
+};
 
 const Auth = ({ onLoginSuccess }) => {
     const [isLogin, setIsLogin] = useState(true);
@@ -13,6 +22,11 @@ const Auth = ({ onLoginSuccess }) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const toggleAuthMode = () => {
+        setIsLogin(!isLogin);
+        setFormData(initialState); 
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         // Sceglie l'URL in base allo stato
@@ -22,6 +36,7 @@ const Auth = ({ onLoginSuccess }) => {
         
         try {
             const res = await axios.post(url, formData);
+            setFormData(initialState);
             if (isLogin) {
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('username', res.data.user.username);
@@ -29,11 +44,13 @@ const Auth = ({ onLoginSuccess }) => {
                 onLoginSuccess();
                 navigate('/');
             } else {
-                alert("Registrazione completata! Ora effettua il login.");
-                setIsLogin(true); // Torna automaticamente al login
+                toast.info("Registrazione completata! Ora effettua il login.");
+                setFormData(initialState);
+                setIsLogin(true); 
             }
         } catch (err) {
-            alert(err.response?.data?.message || "Errore durante l'operazione");
+            setFormData(initialState);
+           toast.error(err.response?.data?.message || "Errore durante l'operazione");
         }
     };
 
@@ -49,8 +66,8 @@ const Auth = ({ onLoginSuccess }) => {
                             <input type="text" name="username" placeholder="Username" onChange={handleChange} required />
                         </>
                     )}
-                    <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-                    <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
+                    <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
+                    <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
                     <button type="submit" className="btn-auth">
                         {isLogin ? 'Login' : 'Crea Account'}
                     </button>
@@ -61,7 +78,7 @@ const Auth = ({ onLoginSuccess }) => {
                     <button 
                         type="button" 
                         className="switch-link" 
-                        onClick={() => setIsLogin(!isLogin)}
+                        onClick={toggleAuthMode}
                     >
                         {isLogin ? 'Registrati qui' : 'Accedi qui'}
                     </button>

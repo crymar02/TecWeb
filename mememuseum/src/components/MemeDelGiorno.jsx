@@ -28,7 +28,7 @@ const MemeDelGiorno = () => {
   return (
     <div className="home-container">
       <div className="museum-header">
-        <h1>L'Opera del Giorno 🏛️</h1>
+        <h1>L'Opera del Giorno</h1>
         <p>Un capolavoro selezionato per questo {new Date().toLocaleDateString('it-IT')}</p>
       </div>
 
