@@ -761,19 +761,20 @@
 }
 
 /* Stile per il link di switch */
-.switch-auth {
-  margin-top: 20px;
-  font-size: 0.9rem;
-  color: #666;
+.switch-link {
+    background: none;
+    border: none;
+    color: #800208; /* Il tuo colore bordeaux */
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0;
+    margin-left: 5px;
+    font-size: 0.9rem;
 }
 
-.switch-link {
-  color: #800208;
-  font-weight: bold;
-  cursor: pointer;
-  text-decoration: underline;
-  background: none;
-  border: none;
-  padding: 0;
-  margin-left: 5px;
+.switch-auth {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: #555;
 }

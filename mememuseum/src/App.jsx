@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css'; 
 import Home from './components/Home.jsx';
-import Login from './components/Auth/Login.jsx';
-import Signup from './components/Auth/Signup.jsx';
+import Auth from './components/Auth.jsx';
 import MemeDelGiorno from './components/MemeDelGiorno.jsx';
 
 function App() {
@@ -39,8 +38,7 @@ function App() {
             <Link to="/meme-del-giorno" className="nav-link">Meme del Giorno</Link>
             {!isLoggedIn ? (
               <>
-                <Link to="/login" className="nav-link">Login</Link>
-                <Link to="/signup" className="btn-signup">Registrati</Link>
+                <Link to="/auth" className="nav-link">Accedi</Link>
               </>
             ) : (
               <button onClick={handleLogout} className="btn-logout">Logout</button>
@@ -49,13 +47,11 @@ function App() {
         </nav>
 
         <div className="content">
-          <Routes>
-            {/* Passiamo lo stato alla Home */}
-            <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
-            <Route path="/login" element={<Login onLoginSuccess={checkLoginStatus} />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/meme-del-giorno" element={<MemeDelGiorno isLoggedIn={isLoggedIn} />} />
-          </Routes>
+        <Routes>
+          <Route path="/" element={<Home isLoggedIn={isLoggedIn} />} />
+          <Route path="/auth" element={<Auth onLoginSuccess={checkLoginStatus} />} />
+          <Route path="/meme-del-giorno" element={<MemeDelGiorno />} />
+        </Routes>
         </div>
       </div>
     </Router>
