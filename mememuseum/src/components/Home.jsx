@@ -96,6 +96,7 @@ useEffect(() => {
           setTimeout(() => {
             element.classList.remove('highlight-red');
           }, 3000);
+          navigate('/', { replace: true });
         }
       }, 500); 
     }
