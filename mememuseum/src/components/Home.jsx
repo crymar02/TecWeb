@@ -24,7 +24,7 @@ const Home = ({ isLoggedIn }) => {
   const [testoModifica, setTestoModifica] = useState("");
   const [tags, setTags] = useState(""); 
   const [filtroTag, setFiltroTag] = useState("");
-  const [ordinamento, setOrdinamento] = useState("recent");
+  const [ordinamento, setOrdinamento] = useState("");
   const [pagina, setPagina] = useState(1);
   const [editingMemeId, setEditingMemeId] = useState(null);
   const [nuovoTitolo, setNuovoTitolo] = useState(""); 
@@ -241,8 +241,8 @@ return (
   </div>
   
   <div className="sort-options">
-    <label>Ordina per:</label>
     <select value={ordinamento} onChange={(e) => setOrdinamento(e.target.value)}>
+      <option value="">Ordina per...</option>
       <option value="recent">Più Recenti</option>
       <option value="oldest">Meno Recenti</option>
       <option value="popular">Più Votati (Upvoted)</option>

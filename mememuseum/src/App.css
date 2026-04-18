@@ -696,14 +696,6 @@ body {
   color: white !important;
 }
 
-.sort-options label {
-  color: white;           
-  margin-right: 5px;     
-  height: 38px;
-  box-sizing: border-box;      /* Include padding e bordi nel calcolo dell'altezza */
-  margin: 0 !important;     
-} 
-
 .tag-badge {
   text-transform: capitalize; 
 }
