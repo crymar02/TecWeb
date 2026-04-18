@@ -12,64 +12,75 @@ const upload = multer({ storage: storage });
 
 // GET Meme 
 router.get('/', async (req, res) => {
-    const { userId, sortBy, page = 1, filtroTag = "" } = req.query;
+    const { userId, sortBy, page = 1, filtroTag = "", date } = req.query;
     const limit = 10; 
     const offset = (page - 1) * limit;
 
     try {
         const searchTerm = `%${filtroTag}%`;
-
-let query = `
-    SELECT 
-        m.*, 
-        u.username,
-        (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,
-        (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = FALSE) AS dislikes,
-        (SELECT voto FROM voto v WHERE v.meme_id = m.id_meme AND v.user_id = $1) AS voto_utente,
-        (SELECT COALESCE(JSON_AGG(json_build_object(
-            'id_commento', c.id_commento,
-            'username', cu.username,
-            'contenuto', c.contenuto,
-            'user_id', c.user_id,
-            'data_creazione_commento', c.data_creazione_commento
-        )), '[]') 
-         FROM commento c 
-         JOIN utente cu ON c.user_id = cu.user_id 
-         WHERE c.meme_id = m.id_meme) AS commenti,
-        COUNT(*) OVER() AS total_count
-    FROM meme m
-    JOIN utente u ON m.user_id = u.user_id
-    WHERE (
-        m.titolo ILIKE $2 
-        OR EXISTS (
-            SELECT 1 FROM unnest(m.tags) AS t 
-            WHERE t ILIKE $2
-        )
-    )
-    GROUP BY m.id_meme, u.username
-`;
-
-        // $1 è userId, $2 è il termine di ricerca
-        const params = [
-            userId ? parseInt(userId) : null, 
+        
+        // 1. Inizializziamo i parametri base
+        let queryParams = [
+            userId && userId !== 'null' ? parseInt(userId) : null, 
             searchTerm
         ];
 
-        // Ordinamento 
+        let query = `
+            SELECT 
+                m.*, 
+                u.username,
+                (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,
+                (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = FALSE) AS dislikes,
+                (SELECT voto FROM voto v WHERE v.meme_id = m.id_meme AND v.user_id = $1) AS voto_utente,
+                (SELECT COALESCE(JSON_AGG(json_build_object(
+                    'id_commento', c.id_commento,
+                    'username', cu.username,
+                    'contenuto', c.contenuto,
+                    'user_id', c.user_id,
+                    'data_creazione_commento', c.data_creazione_commento
+                )), '[]') 
+                 FROM commento c 
+                 JOIN utente cu ON c.user_id = cu.user_id 
+                 WHERE c.meme_id = m.id_meme) AS commenti,
+                COUNT(*) OVER() AS total_count
+            FROM meme m
+            JOIN utente u ON m.user_id = u.user_id
+            WHERE (
+                m.titolo ILIKE $2 
+                OR EXISTS (
+                    SELECT 1 FROM unnest(m.tags) AS t 
+                    WHERE t ILIKE $2
+                )
+            )
+        `;
+
+        // 2. FILTRO DATA: Aggiunta dinamica
+       if (date && date !== 'undefined' && date !== '') {
+       queryParams.push(date); 
+       // Usiamo ::date su entrambi i lati per un confronto "pulito" solo su giorno/mese/anno
+        query += ` AND m.data_creazione::date = $${queryParams.length}::date`;
+        }
+
+        // 3. Raggruppamento (necessario dopo il WHERE)
+        query += ` GROUP BY m.id_meme, u.username`;
+
+        // 4. Ordinamento 
         if (sortBy === 'popular') {
-        query += ` ORDER BY likes DESC`;
+            query += ` ORDER BY likes DESC`;
         } else if (sortBy === 'controversial') {
-        query += ` ORDER BY dislikes DESC`;
+            query += ` ORDER BY dislikes DESC`;
         } else if (sortBy === 'oldest') {
-         query += ` ORDER BY m.data_creazione ASC`; 
+            query += ` ORDER BY m.data_creazione ASC`; 
         } else {
-       query += ` ORDER BY m.data_creazione DESC`;
-    }
+            query += ` ORDER BY m.data_creazione DESC`;
+        }
 
-        // LIMIT E OFFSET
-        query += ` LIMIT ${limit} OFFSET ${offset}`;
+        // 5. Paginazione
+        queryParams.push(limit, offset);
+        query += ` LIMIT $${queryParams.length - 1} OFFSET $${queryParams.length}`;
 
-        const result = await pool.query(query, params);
+        // USA queryParams, NON params (che avevi ridefinito erroneamente)
+        const result = await pool.query(query, queryParams);
         res.json(result.rows);
     } catch (err) {
         console.error(err);

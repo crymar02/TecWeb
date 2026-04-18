@@ -3,6 +3,11 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { registerLocale } from  "react-datepicker";
+import it from 'date-fns/locale/it';
+registerLocale('it', it);
 
 const Home = ({ isLoggedIn }) => {
   const navigate = useNavigate();
@@ -25,6 +30,7 @@ const Home = ({ isLoggedIn }) => {
   const [nuovoTitolo, setNuovoTitolo] = useState(""); 
   const location = useLocation();
   const [commentoDaEliminare, setCommentoDaEliminare] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
 
 
 const fetchMemes = async () => {
@@ -36,9 +42,14 @@ const fetchMemes = async () => {
           userId: userId,
           sortBy: ordinamento, 
           page: pagina, 
-          filtroTag: filtroTag 
+          filtroTag: filtroTag,
+          date: selectedDate 
+            ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}`
+            : undefined
         }
       });
+
+     
 
       // Verifichiamo che i dati siano un array
       if (res.data && Array.isArray(res.data)) {
@@ -63,7 +74,7 @@ const fetchMemes = async () => {
 
   useEffect(() => {
     fetchMemes();
-  }, [ordinamento, pagina, filtroTag]);
+  }, [ordinamento, pagina, filtroTag, selectedDate]);
 
 
 useEffect(() => {
@@ -211,6 +222,22 @@ return (
   }}
 />
     {filtroTag && <button onClick={() => setFiltroTag("")} className="btn-clear">×</button>}
+  </div>
+
+  <div className="date-picker-group">
+    <label>Filtra per data:</label>
+    <DatePicker
+      selected={selectedDate}
+      onChange={(date) => {
+        setSelectedDate(date);
+        setPagina(1); 
+      }}
+      dateFormat="dd/MM/yyyy"
+      isClearable
+      placeholderText="Cerca per data..."
+      locale="it"
+      className="custom-date-input"
+    />
   </div>
   
   <div className="sort-options">
