@@ -7,6 +7,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { registerLocale } from  "react-datepicker";
 import it from 'date-fns/locale/it';
+
 registerLocale('it', it);
 
 const Home = ({ isLoggedIn }) => {
@@ -36,7 +37,6 @@ const Home = ({ isLoggedIn }) => {
 const fetchMemes = async () => {
     try {
       const userId = localStorage.getItem('userId');
-      
       const res = await axios.get('http://localhost:3000/api/memes', {
         params: { 
           userId: userId,
@@ -49,14 +49,12 @@ const fetchMemes = async () => {
         }
       });
 
-     
-
-      // Verifichiamo che i dati siano un array
+      // Verifica se la risposta è un array
       if (res.data && Array.isArray(res.data)) {
         setMemes(res.data);
         
-        // Recuperiamo il conteggio totale dal primo elemento (se esiste)
-        if (res.data.length > 0 && res.data[0].total_count) {
+      // Recuperiamo il conteggio totale dal primo elemento (se esiste)
+      if (res.data.length > 0 && res.data[0].total_count) {
           setTotalMemes(parseInt(res.data[0].total_count));
         } else {
           setTotalMemes(0);
@@ -72,20 +70,24 @@ const fetchMemes = async () => {
     }
   };
 
+  //--USE EFFECT--
+
+  // Ricarica i meme quando cambiano ordinamento, pagina, filtroTag o data
   useEffect(() => {
-    fetchMemes();
+   fetchMemes();
   }, [ordinamento, pagina, filtroTag, selectedDate]);
 
-
-useEffect(() => {
-  fetchMemes();
+  // Ricarica i meme quando si torna alla home da altre pagine
+  useEffect(() => {
+   fetchMemes();
    setCommentiAperti({});
-  window.scrollTo(0, 0); 
-}, [pagina, ordinamento, filtroTag]);
+   window.scrollTo(0, 0); 
+ }, [pagina, ordinamento, filtroTag]);
 
-useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const highlightId = params.get('highlight');
+  // Evidenzia e scrolla al meme se c'è il parametro "highlight" nell'URL
+  useEffect(() => {
+   const params = new URLSearchParams(location.search);
+   const highlightId = params.get('highlight');
 
     if (highlightId && memes.length > 0) {
       setTimeout(() => {
@@ -102,10 +104,13 @@ useEffect(() => {
     }
   }, [memes, location.search]);
 
-  const toggleCommenti = (memeId) => {
+   const toggleCommenti = (memeId) => {
     setCommentiAperti(prev => ({ ...prev, [memeId]: !prev[memeId] }));
   };
 
+//-- HANDLER --
+
+// Gestisce l'upload di un nuovo meme
 const handleUpload = async (e) => {
   e.preventDefault();
   const formData = new FormData();
@@ -128,6 +133,7 @@ const handleUpload = async (e) => {
   }
 };
 
+// Gestisce i voti (upvote/downvote)
 const handleVoto = async (memeId, tipoVoto) => {
   if (!isLoggedIn) return toast.warn("Devi effettuare il login per votare!");
   try {
@@ -139,7 +145,9 @@ const handleVoto = async (memeId, tipoVoto) => {
     fetchMemes(); 
   } catch (err) { toast.error("Impossibile registrare il voto"); }
 };
-  const handleInviaCommento = async (memeId) => {
+
+// Gestisce l'invio di un nuovo commento
+const handleInviaCommento = async (memeId) => {
     const contenuto = commentiTesto[memeId];
     if (!contenuto?.trim()) return;
     try {
@@ -151,6 +159,7 @@ const handleVoto = async (memeId, tipoVoto) => {
     } catch (err) { console.error(err); }
   };
 
+// Gestisce l'eliminazione di un commento
 const handleEliminaCommento = async (id) => {
   try {
     await axios.delete(`http://localhost:3000/api/commenti/${id}`, {
@@ -165,7 +174,8 @@ const handleEliminaCommento = async (id) => {
   }
 };
 
-  const handleSalvaModifica = async (commentoId) => {
+// Gestisce la modifica di un commento
+const handleSalvaModifica = async (commentoId) => {
     try {
       await axios.put(`http://localhost:3000/api/commenti/${commentoId}`, {
         user_id: localStorage.getItem('userId'), nuovoContenuto: testoModifica
@@ -176,7 +186,8 @@ const handleEliminaCommento = async (id) => {
     } catch (err) { toast.error("Errore durante la modifica del commento"); }
   };
 
-  const handleDelete = async (id) => {
+// Gestisce l'eliminazione di un meme
+const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/api/memes/${id}`, {
         data: { user_id: localStorage.getItem('userId') }
@@ -189,7 +200,8 @@ const handleEliminaCommento = async (id) => {
     }
   };
 
-  const handleSalvaTitolo = async (memeId) => {
+// Gestisce la modifica del titolo di un meme
+const handleSalvaTitolo = async (memeId) => {
   try {
     const userId = localStorage.getItem('userId');
     await axios.put(`http://localhost:3000/api/memes/${memeId}/titolo`, {
@@ -205,29 +217,32 @@ const handleEliminaCommento = async (id) => {
 };
 
 
+//-- RENDER --
+
 return (
     <div className="home-container">
       <div className="museum-header">
         <h1>{isLoggedIn ? `Bentornato, ${localStorage.getItem('username')}!` : "Benvenuto nel Mememuseum"}</h1>
         <p>Esplora l'esposizione corrente o contribuisci con la tua arte.</p>
       </div>
+      {/* Sezione di ricerca */}
       <div className="search-section">
-  <div className="search-bar">
-   <input 
-  type="text" 
-  placeholder="Cerca per tag o titolo..." 
-  value={filtroTag}
-  onChange={(e) => {
-    setFiltroTag(e.target.value.toLowerCase());
-    setPagina(1); 
-  }}
-/>
-    {filtroTag && <button onClick={() => setFiltroTag("")} className="btn-clear">×</button>}
-  </div>
+      <div className="search-bar">
+       <input 
+       type="text" 
+       placeholder="Cerca per tag o titolo..." 
+       value={filtroTag}
+        onChange={(e) => {
+          setFiltroTag(e.target.value.toLowerCase());
+          setPagina(1); 
+      }}
+       />
+      {filtroTag && <button onClick={() => setFiltroTag("")} className="btn-clear">×</button>}
+      </div>
 
-  <div className="date-picker-group">
-    <label>Filtra per data:</label>
-    <DatePicker
+    <div className="date-picker-group">
+      <label>Filtra per data:</label>
+      <DatePicker
       selected={selectedDate}
       onChange={(date) => {
         setSelectedDate(date);
@@ -238,19 +253,19 @@ return (
       placeholderText="Cerca per data..."
       locale="it"
       className="custom-date-input"
-    />
-  </div>
+     />
+    </div>
   
-  <div className="sort-options">
-    <select value={ordinamento} onChange={(e) => setOrdinamento(e.target.value)}>
+    <div className="sort-options">
+     <select value={ordinamento} onChange={(e) => setOrdinamento(e.target.value)}>
       <option value="">Ordina per...</option>
       <option value="recent">Più Recenti</option>
       <option value="oldest">Meno Recenti</option>
       <option value="popular">Più Votati (Upvoted)</option>
       <option value="controversial">Meno votati (Downvoted)</option>
     </select>
-  </div>
-</div>
+    </div>
+     </div>
       <div className="gallery-grid">
         {/* Card Upload */}
         {isLoggedIn && (
@@ -279,7 +294,7 @@ return (
         {memes.map((meme) => (
           <div key={meme.id_meme} id={`meme-${meme.id_meme}`} className="meme-card">
             
-            {/* Crocetta di eliminazione in alto a destra */}
+            {/*Eliminazione meme */}
             {isLoggedIn && parseInt(localStorage.getItem('userId')) === meme.user_id && (
               <div className="top-delete-container">
                 {memeDaEliminare === meme.id_meme ? (
@@ -297,34 +312,34 @@ return (
             <img src={meme.url_immagine} alt={meme.titolo} className="meme-img" />
             
             <div className="meme-info">
-  <div className="meme-header">
-  {editingMemeId === meme.id_meme ? (
-    <div className="edit-title-container">
-      <input 
-        value={nuovoTitolo} 
-        onChange={(e) => setNuovoTitolo(e.target.value)}
-        className="edit-title-input"
-        autoFocus
-      />
-      <div className="edit-actions">
-        <button onClick={() => handleSalvaTitolo(meme.id_meme)} className="btn-edit-small">Salva</button>
-        <span className="button-spacer"> </span>
-        <button onClick={() => setEditingMemeId(null)} className="btn-edit-small">Annulla</button>
-      </div>
-    </div>
-  ) : (
-    <h3 className="title-with-icon">
-      {meme.titolo}
-      {isLoggedIn && parseInt(localStorage.getItem('userId')) === meme.user_id && (
-        <i 
+             <div className="meme-header">
+              {editingMemeId === meme.id_meme ? (
+             <div className="edit-title-container">
+              <input 
+              value={nuovoTitolo} 
+              onChange={(e) => setNuovoTitolo(e.target.value)}
+              className="edit-title-input"
+              autoFocus
+             />
+            <div className="edit-actions">
+             <button onClick={() => handleSalvaTitolo(meme.id_meme)} className="btn-edit-small">Salva</button>
+             <span className="button-spacer"> </span>
+             <button onClick={() => setEditingMemeId(null)} className="btn-edit-small">Annulla</button>
+           </div>
+           </div>
+       ) : (
+          <h3 className="title-with-icon">
+         {meme.titolo}
+         {isLoggedIn && parseInt(localStorage.getItem('userId')) === meme.user_id && (
+          <i 
           className="fa-solid fa-pen btn-edit-icon" 
           onClick={() => { setEditingMemeId(meme.id_meme); setNuovoTitolo(meme.titolo); }}
           title="Modifica titolo"
         ></i>
-      )}
-    </h3>
-  )}
-</div>
+        )}
+         </h3>
+     )}
+       </div>
               <p className="meme-description">{meme.descrizione}</p>
               {/* Visualizzazione Tag */}
             <div className="meme-tags">
@@ -335,6 +350,7 @@ return (
 
               <div className="meme-interactions">
                 <div className="interaction-bar">
+                {/* Sezione Voti */}
                   <div className="vote-section"> 
                     <button 
                 onClick={() => handleVoto(meme.id_meme, true)} 
@@ -350,6 +366,7 @@ return (
           <i className="fa-solid fa-thumbs-down"></i> {meme.dislikes}
           </button>
                   </div>
+                  {/* Sezione Commenti */}
                   <button className="btn-show-comments" onClick={() => toggleCommenti(meme.id_meme)}>
                   <i className="fa-solid fa-comment"></i> {meme.commenti?.length || 0}
                   </button>

@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 
 
 // --- SICUREZZA E MIDDLEWARE BASE ---
-app.disable('x-powered-by'); // Nasconde Express agli attaccanti
+app.disable('x-powered-by'); // Rimuove l'header "X-Powered-By" per nascondere che usiamo Express
 app.use(express.json());    // Parsing del corpo delle richieste in JSON
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

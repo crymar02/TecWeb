@@ -10,7 +10,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// GET Meme 
+// GET di un meme con filtri, ordinamento e paginazione 
 router.get('/', async (req, res) => {
     const { userId, sortBy, page = 1, filtroTag = "", date } = req.query;
     const limit = 10; 
@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
     try {
         const searchTerm = `%${filtroTag}%`;
         
-        // 1. Inizializziamo i parametri base
+        // 1. Costruzione dinamica della query e dei parametri
         let queryParams = [
             userId && userId !== 'null' ? parseInt(userId) : null, 
             searchTerm
@@ -54,14 +54,14 @@ router.get('/', async (req, res) => {
             )
         `;
 
-        // 2. FILTRO DATA: Aggiunta dinamica
+        // 2. Filtro per data (se presente)
        if (date && date !== 'undefined' && date !== '') {
        queryParams.push(date); 
-       // Usiamo ::date su entrambi i lati per un confronto "pulito" solo su giorno/mese/anno
-        query += ` AND m.data_creazione::date = $${queryParams.length}::date`;
+
+       query += ` AND m.data_creazione::date = $${queryParams.length}::date`;
         }
 
-        // 3. Raggruppamento (necessario dopo il WHERE)
+        // 3. Group By necessario per le subquery di aggregazione (likes, dislikes, commenti)
         query += ` GROUP BY m.id_meme, u.username`;
 
         // 4. Ordinamento 
@@ -79,7 +79,6 @@ router.get('/', async (req, res) => {
         queryParams.push(limit, offset);
         query += ` LIMIT $${queryParams.length - 1} OFFSET $${queryParams.length}`;
 
-        // USA queryParams, NON params (che avevi ridefinito erroneamente)
         const result = await pool.query(query, queryParams);
         res.json(result.rows);
     } catch (err) {
@@ -89,7 +88,7 @@ router.get('/', async (req, res) => {
 });
        
 
-// Upload Meme 
+// UPLOAD di un nuovo meme 
 router.post('/upload', upload.single('immagine'), async (req, res) => {
     try {
         const { titolo, descrizione, user_id, tags } = req.body;
@@ -106,7 +105,7 @@ router.post('/upload', upload.single('immagine'), async (req, res) => {
             descrizione, 
             url_immagine, 
             parseInt(user_id), 
-            tagsArray // PostgreSQL accetta array JS per colonne TEXT[]
+            tagsArray 
         ]);
         
         res.status(201).json(result.rows[0]);
@@ -115,7 +114,7 @@ router.post('/upload', upload.single('immagine'), async (req, res) => {
     }
 });
 
-// Delete Meme
+// DELETE di un meme (solo se è il proprietario)
 router.delete('/:id', async (req, res) => {
     const { id } = req.params;
     const { user_id } = req.body;
@@ -128,13 +127,13 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-// Rotta per modificare il titolo del meme
+// MODIFICA titolo di un meme (solo se è il proprietario)
 router.put('/:id/titolo', async (req, res) => {
     const { id } = req.params;
     const { titolo, user_id } = req.body;
 
     try {
-        // Controlliamo che chi modifica sia l'effettivo proprietario
+        // Controlla che chi modifica sia il proprietario
         const result = await pool.query(
             'UPDATE meme SET titolo = $1 WHERE id_meme = $2 AND user_id = $3 RETURNING *',
             [titolo, id, user_id]
@@ -150,16 +149,16 @@ router.put('/:id/titolo', async (req, res) => {
     }
 });
 
-// Rotta per il Meme del Giorno
+// GET del meme del giorno (rotazione basata sul giorno dell'anno) con like, commenti e autore
 router.get('/del-giorno', async (req, res) => {
     try {
-        // 1. Contiamo quanti meme totali ci sono
+        // 1. Conta quanti meme totali ci sono
         const countRes = await pool.query('SELECT COUNT(*) FROM meme');
         const totalMemes = parseInt(countRes.rows[0].count);
 
         if (totalMemes === 0) return res.status(404).json({ error: "Nessun meme in archivio" });
 
-        // 2. Algoritmo di rotazione semplice: (Giorno dell'anno) % (Totale Meme)
+        // 2. Algoritmo di rotazione: (Giorno dell'anno) % (Totale Meme)
         const oggi = new Date();
         const inizioAnno = new Date(oggi.getFullYear(), 0, 0);
         const diff = oggi - inizioAnno;
@@ -167,7 +166,7 @@ router.get('/del-giorno', async (req, res) => {
         
         const offset = giornoDellAnno % totalMemes;
 
-        // 3. Recuperiamo il meme a quell'indice con i dati necessari (like, commenti, autore)
+        // 3. Query per ottenere il meme del giorno con autore, like, dislike e commenti
         const query = `
             SELECT m.*, u.username,
             (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,

@@ -6,6 +6,7 @@ const MemeDelGiorno = () => {
   const [meme, setMeme] = useState(null);
   const navigate = useNavigate();
 
+  // Recupera il meme del giorno 
   useEffect(() => {
     const fetchMemeDelGiorno = async () => {
       try {

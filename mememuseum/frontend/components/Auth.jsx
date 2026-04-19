@@ -29,7 +29,7 @@ const Auth = ({ onLoginSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Sceglie l'URL in base allo stato
+        // Determina l'endpoint in base alla modalità (login o signup)
         const url = isLogin 
             ? 'http://localhost:3000/api/auth/login' 
             : 'http://localhost:3000/api/auth/signup';

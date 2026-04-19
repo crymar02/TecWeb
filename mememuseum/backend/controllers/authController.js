@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { pool } from '../db.js'; // Aggiunto .js e rimosso require
-import 'dotenv/config'; // Per usare process.env.JWT_SECRET
+import { pool } from '../db.js'; 
+import 'dotenv/config';
 
 export const signup = async (req, res) => {
     try {
@@ -17,11 +17,11 @@ export const signup = async (req, res) => {
             return res.status(400).json({ message: "Username o Email già in uso" });
         }
 
-        // 2. Hashing della password
+        // 2. Hashing della password 
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        // 3. Inserimento nel database 
+        // 3. Inserimento user nel database 
         const newUser = await pool.query(
             'INSERT INTO utente (nome, cognome, username, email, password) VALUES ($1, $2, $3, $4, $5) RETURNING user_id, username',
             [nome, cognome, username, email, hashedPassword]

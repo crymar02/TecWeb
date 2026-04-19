@@ -15,7 +15,7 @@ const authMiddleware = (req, res, next) => {
         // 3. Salva i dati dell'utente (id e username) nella richiesta
         req.user = verified;
         
-        // 4. Passa alla funzione successiva (il controller)
+        // 4. Passa al prossimo middleware o alla route handler
         next();
     } catch (err) {
         res.status(403).json({ message: "Token non valido o scaduto." });

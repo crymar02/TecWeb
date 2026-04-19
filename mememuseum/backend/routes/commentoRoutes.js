@@ -1,8 +1,9 @@
 import express from 'express';
 import { pool } from '../db.js';
+
 const router = express.Router();
 
-// CREA un commento
+// CREA un nuovo commento
 router.post('/', async (req, res) => {
     const { meme_id, user_id, contenuto } = req.body;
     try {

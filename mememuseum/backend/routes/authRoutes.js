@@ -1,8 +1,9 @@
 import express from 'express';
-const router = express.Router();
-// Importiamo le funzioni del controller (aggiungi .js!)
 import { signup, login } from '../controllers/authController.js';
 
+const router = express.Router();
+
+//Definisce le rotte per la registrazione e il login degli utenti
 router.post('/signup', signup);
 router.post('/login', login);
 

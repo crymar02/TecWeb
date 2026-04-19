@@ -1,6 +1,7 @@
 import pkg from 'pg';
-const { Pool } = pkg;
 import 'dotenv/config';
+
+const { Pool } = pkg;
 
 // Crea una connessione al database usando il pool
 const pool = new Pool({
@@ -17,7 +18,4 @@ async function testConnection() {
     }
 }
 
-
-
-// Esportazione per i moduli ESM
 export { pool };
