@@ -92,17 +92,19 @@ CREATE TABLE voto(
 ## Setup Backend
 Accedi alla cartella del server, installa le dipendenze e configura l'ambiente:
 - Entra nella cartella backend:
+```text
 cd backend
-
+```
 - Installa le librerie (express, pg, dotenv, cors, etc.):
+ ```text
 npm install
-
+```
 - Crea il file .env e incolla il seguente contenuto (modificando le tue credenziali)
 ```text
 cat <<EOF > .env  
 PORT=3000  
 DATABASE_URL=postgres://postgres:TUAPASSWORD@localhost:5432/mememuseum  
-JWT_SECRET=Chiave segreta molto lunga  
+JWT_SECRET=CHIAVE SEGRETA
 EOF
 ```
 
