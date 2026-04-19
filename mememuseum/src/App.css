@@ -895,9 +895,9 @@ body {
     color: #555;
 }
 
-/* --- FIX PER MOBILE AGGIORNATO --- */
+/* --- FIX PER MOBILE  --- */
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .App {
     padding-top: 220px !important; 
   }
@@ -907,7 +907,7 @@ body {
     height: auto !important;
     padding-top: 10px !important;    /* Spazio sopra il logo */
     padding-bottom: 10px !important; /* Spazio extra SOTTO i tasti */
-    gap: 60x !important;            /* Spazio ENORME tra Logo e Tasti */
+    gap: 10px !important;            /* Spazio ENORME tra Logo e Tasti */
     position: fixed !important;
     top: 0;
     left: 0;
@@ -941,6 +941,16 @@ body {
     padding: 10px 12px !important;
     border-radius: 6px !important;
   }
+
+  /* Trova questa parte nel tuo App.css e modificala così */
+.date-picker-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 0 !important; 
+  margin-right: 60px;
+  margin-top: 0 !important;
+}
 }
 
 /* Il contenitore che tiene insieme immagine e testo */
@@ -970,3 +980,4 @@ body {
   line-height: 1;         /* Evita spazi bianchi eccessivi sopra/sotto */
   text-transform: uppercase;
 }
+
