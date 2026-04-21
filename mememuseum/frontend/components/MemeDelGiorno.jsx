@@ -33,7 +33,7 @@ const MemeDelGiorno = () => {
         <p>Un capolavoro selezionato per questo {new Date().toLocaleDateString('it-IT')}</p>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '30px', height: '30%',width: '30%', margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '30px', height: '100%',width: '100%', margin: '0 auto' }}>
         <div className="meme-card" style={{ margin: 0 }}>
           <img src={meme.url_immagine} alt={meme.titolo} className="meme-img" />
           

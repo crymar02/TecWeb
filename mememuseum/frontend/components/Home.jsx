@@ -247,7 +247,7 @@ const handleSalvaTitolo = async (memeId) => {
 return (
     <div className="home-container">
       <div className="museum-header">
-        <h1>{isLoggedIn ? `Bentornato/a, ${localStorage.getItem('username')}!` : "Benvenuto/a nel Mememuseum"}</h1>
+        <h1>{isLoggedIn ? `Ciao, ${localStorage.getItem('username')}!` : "Benvenuti nel Mememuseum"}</h1>
         <p>Esplora l'esposizione corrente o contribuisci con la tua arte.</p>
       </div>
       {/* Sezione di ricerca */}
