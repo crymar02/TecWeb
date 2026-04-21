@@ -22,11 +22,11 @@ describe('MEMEMUSEUM - Test Suite Finale', () => {
 
   describe('Auth & Actions', () => {
     beforeEach(() => {
-      cy.login('marioross@gmail.com', 'marioro123');
+      cy.login('crimar@gmail.com', 'pass123');
     });
 
     it('4. Apertura form di Upload', () => {
-      cy.login('marioross@gmail.com', 'marioro123'); 
+      cy.login('crimar@gmail.com', 'pass123'); 
       cy.visit('/');
       cy.get('.plus-icon-wrapper').click();
       cy.get('input[placeholder="Titolo..."]').should('be.visible');
