@@ -84,6 +84,31 @@ const fetchMemes = async () => {
    window.scrollTo(0, 0); 
  }, [pagina, ordinamento, filtroTag]);
 
+
+// Cerca la pagina del meme da evidenziare 
+useEffect(() => {
+  const cercaPaginaMeme = async () => {
+    const params = new URLSearchParams(location.search);
+    const highlightId = params.get('highlight');
+
+    if (highlightId) {
+      try {
+        const res = await axios.get(`http://localhost:3000/api/memes/posizione/${highlightId}`);
+        const paginaTarget = res.data.pagina;
+
+        // Se la pagina calcolata è diversa da quella attuale, la cambiamo
+        if (paginaTarget !== pagina) {
+          setPagina(paginaTarget);
+        }
+      } catch (err) {
+        console.error("Errore nel recupero della pagina del meme:", err);
+      }
+    }
+  };
+
+  cercaPaginaMeme();
+}, [location.search]); // Si attiva ogni volta che l'URL cambia
+
   // Evidenzia e scrolla al meme se c'è il parametro "highlight" nell'URL
   useEffect(() => {
    const params = new URLSearchParams(location.search);
@@ -222,7 +247,7 @@ const handleSalvaTitolo = async (memeId) => {
 return (
     <div className="home-container">
       <div className="museum-header">
-        <h1>{isLoggedIn ? `Bentornato, ${localStorage.getItem('username')}!` : "Benvenuto nel Mememuseum"}</h1>
+        <h1>{isLoggedIn ? `Bentornato/a, ${localStorage.getItem('username')}!` : "Benvenuto/a nel Mememuseum"}</h1>
         <p>Esplora l'esposizione corrente o contribuisci con la tua arte.</p>
       </div>
       {/* Sezione di ricerca */}

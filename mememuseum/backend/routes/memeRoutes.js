@@ -149,36 +149,64 @@ router.put('/:id/titolo', async (req, res) => {
     }
 });
 
-// GET del meme del giorno (rotazione basata sul giorno dell'anno) con like, commenti e autore
+// GET del meme del giorno (1 meme random fisso per tutto il giorno)
 router.get('/del-giorno', async (req, res) => {
     try {
-        // 1. Conta quanti meme totali ci sono
-        const countRes = await pool.query('SELECT COUNT(*) FROM meme');
-        const totalMemes = parseInt(countRes.rows[0].count);
-
-        if (totalMemes === 0) return res.status(404).json({ error: "Nessun meme in archivio" });
-
-        // 2. Algoritmo di rotazione: (Giorno dell'anno) % (Totale Meme)
-        const oggi = new Date();
-        const inizioAnno = new Date(oggi.getFullYear(), 0, 0);
-        const diff = oggi - inizioAnno;
-        const giornoDellAnno = Math.floor(diff / (1000 * 60 * 60 * 24));
+        // 1. Ottiene una stringa per il giorno (es: "20240520")
+        const oggi = new Date().toISOString().split('T')[0].replace(/-/g, '');
         
-        const offset = giornoDellAnno % totalMemes;
+        // Divide per un numero grande per normalizzare il valore
+        const seed = (parseInt(oggi) % 1000) / 1000; 
 
-        // 3. Query per ottenere il meme del giorno con autore, like, dislike e commenti
-        const query = `
+        // 3. Esegue setseed per bloccare la sequenza di random() per oggi
+        await pool.query('SELECT setseed($1)', [seed]);
+
+        // 4. Seleziona il meme 
+        const result = await pool.query(`
             SELECT m.*, u.username,
             (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = TRUE) AS likes,
             (SELECT COUNT(*) FROM voto v WHERE v.meme_id = m.id_meme AND v.voto = FALSE) AS dislikes
-            
             FROM meme m
             JOIN utente u ON m.user_id = u.user_id
-            LIMIT 1 OFFSET $1
+            ORDER BY random()
+            LIMIT 1
+        `);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "Nessun meme in archivio" });
+        }
+        
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error("Errore nel calcolo del meme del giorno:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GET per calcolare la posizione di un meme specifico (per evidenziarlo in home)
+router.get('/posizione/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const limit = 10; 
+
+        const query = `
+            SELECT riga FROM (
+                SELECT id_meme, ROW_NUMBER() OVER (ORDER BY data_creazione DESC) as riga
+                FROM meme
+            ) as lista_ordinata
+            WHERE id_meme = $1
         `;
         
-        const result = await pool.query(query, [offset]);
-        res.json(result.rows[0]);
+        const result = await pool.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "Meme non trovato" });
+        }
+
+        const posizione = parseInt(result.rows[0].riga);
+        const paginaCalcolata = Math.ceil(posizione / limit);
+
+        res.json({ pagina: paginaCalcolata });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
