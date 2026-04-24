@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import './UploadCard.css';
 
 const UploadCard = ({ onUploadSuccess }) => {
   const [showForm, setShowForm] = useState(false);
@@ -59,7 +60,7 @@ const UploadCard = ({ onUploadSuccess }) => {
           
           <input 
             type="text" 
-            placeholder="Titolo dell'opera..." 
+            placeholder="Titolo..." 
             value={titolo}
             onChange={(e) => setTitolo(e.target.value)}
             required 

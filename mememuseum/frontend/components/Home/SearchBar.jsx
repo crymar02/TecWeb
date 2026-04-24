@@ -2,7 +2,7 @@ import React from 'react';
 import DatePicker, { registerLocale } from "react-datepicker";
 import it from 'date-fns/locale/it';
 import "react-datepicker/dist/react-datepicker.css";
-
+import './SearchBar.css';
 
 
 registerLocale('it', it);

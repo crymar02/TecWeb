@@ -1,4 +1,5 @@
 import React from 'react';
+import './Pagination.css';
 
 const Pagination = ({ pagina, setPagina, totalMemes }) => {
   const LIMIT = 10;

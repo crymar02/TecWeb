@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './MemeDelGiorno.css'; // <--- Importa il file CSS qui
+import './MemeDelGiorno.css'; 
 
 const MemeDelGiorno = () => {
   const [meme, setMeme] = useState(null);
@@ -52,7 +52,7 @@ const MemeDelGiorno = () => {
                   onClick={vaiAlMemeInHome}
                   className="btn-publish btn-details" 
                 >
-                  Mostra ulteriori dettagli ➔
+                  Mostra ulteriori dettagli
                 </button>
               </div>
             </div>

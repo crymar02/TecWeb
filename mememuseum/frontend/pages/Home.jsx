@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import './Home.css';
 import SearchBar from '../components/Home/SearchBar';
 import UploadCard from '../components/Home/UploadCard';
 import MemeCard from '../components/Home/MemeCard';

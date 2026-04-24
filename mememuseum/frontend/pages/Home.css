@@ -1,0 +1,35 @@
+.home-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.museum-header {
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+  padding: 20px 0;
+  align-items: stretch;
+}
+
+/* Evidenziazione Card (Meme del Giorno) */
+.highlight-red {
+  border: 3px solid #ff0000 !important; 
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.5) !important;
+  transform: scale(1.02); 
+  transition: all 0.4s ease-in-out;
+  z-index: 10;
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.493); }
+  50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.493); }
+  100% { box-shadow: 0 0 10px rgba(255, 0, 0, 0.493); }
+}

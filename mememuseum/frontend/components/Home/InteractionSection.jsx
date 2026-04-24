@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import './InteractionSection.css';
 
 const InteractionSection = ({ meme, isLoggedIn, onActionSuccess }) => {
   const [isOpen, setIsOpen] = useState(false);

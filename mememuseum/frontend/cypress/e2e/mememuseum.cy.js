@@ -28,7 +28,7 @@ describe('MEMEMUSEUM - Test Suite Finale', () => {
     it('4. Apertura form di Upload', () => {
       cy.login('crimar@gmail.com', 'pass123'); 
       cy.visit('/');
-      cy.get('.plus-icon-wrapper').click();
+      cy.get('.plus-icon').click();
       cy.get('input[placeholder="Titolo..."]').should('be.visible');
       cy.get('textarea[placeholder="Descrizione..."]').should('be.visible');
   
@@ -50,11 +50,13 @@ describe('MEMEMUSEUM - Test Suite Finale', () => {
       cy.get('.meme-card').should('be.visible');
     });
 
-    it('7. Dettaglio Meme (da Meme del Giorno)', () => {
-      cy.visit('/meme-del-giorno');
-      cy.get('.btn-publish').contains('Mostra ulteriori dettagli').click();
-      cy.url().should('include', 'highlight=');
-    });
+   it('7. Dettaglio Meme (da Meme del Giorno)', () => {
+  cy.visit('/meme-del-giorno');
+  cy.get('.meme-card-day', { timeout: 10000 }).should('be.visible');
+  cy.get('.btn-details').click();
+  cy.url().should('eq', Cypress.config().baseUrl + '/');
+  cy.get('.highlight-red').should('exist');
+});
   });
 
   describe('Security', () => {

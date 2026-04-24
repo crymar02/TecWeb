@@ -1,0 +1,38 @@
+.site-pagination {
+  width: 100%;
+  display: flex;
+  justify-content: center; 
+  padding: 40px 0;
+  clear: both; 
+}
+
+.pagination-pill {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  padding: 10px 25px;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.nav-btn {
+  background: #800208;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.nav-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.current-page {
+  font-weight: bold;
+  color: #800208;
+  text-transform: uppercase;
+}

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import InteractionSection from './InteractionSection';
+import './MemeCard.css';
 
 const MemeCard = ({ meme, isLoggedIn, onActionSuccess }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -19,7 +20,7 @@ const MemeCard = ({ meme, isLoggedIn, onActionSuccess }) => {
       });
       setIsEditingTitle(false);
       toast.success("Titolo aggiornato con successo!");
-      onActionSuccess(); // Ricarica i dati nella Home
+      onActionSuccess(); 
     } catch (err) {
       toast.error("Errore nel salvataggio del titolo");
     }
