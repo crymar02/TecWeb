@@ -3,9 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css'; 
-import Home from './components/Home.jsx';
-import Auth from './components/Auth.jsx';
-import MemeDelGiorno from './components/MemeDelGiorno.jsx';
+import Home from './pages/Home.jsx';
+import Auth from './pages/Auth.jsx';
+import MemeDelGiorno from './pages/MemeDelGiorno.jsx';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

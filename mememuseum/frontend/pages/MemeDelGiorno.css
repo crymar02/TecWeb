@@ -1,0 +1,18 @@
+.meme-container-flex {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+  height: 30%;
+  width: 30%;
+  margin: 0 auto;
+}
+
+.meme-card-day {
+  margin: 0;
+}
+
+.btn-details {
+  margin-top: 15px;
+  cursor: pointer;
+  width: 100%;
+}
