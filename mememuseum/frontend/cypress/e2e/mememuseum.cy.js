@@ -26,13 +26,11 @@ describe('MEMEMUSEUM - Test Suite Finale', () => {
     });
 
     it('4. Apertura form di Upload', () => {
-      cy.login('crimar@gmail.com', 'pass123'); 
       cy.visit('/');
       cy.get('.plus-icon').click();
       cy.get('input[placeholder="Titolo..."]').should('be.visible');
       cy.get('textarea[placeholder="Descrizione..."]').should('be.visible');
   
-      //Verifica il bottone "Pubblica"
       cy.get('.btn-publish').contains('Pubblica').should('be.visible');
    });
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import './App.css'; 
@@ -27,7 +27,7 @@ const handleLogout = async () => {
         await axios.post('http://localhost:3000/api/auth/logout', {}, { withCredentials: true });
         localStorage.clear();
         setIsLoggedIn(false);
-        toast.info("Sessione chiusa");
+        toast.info("Logout effettuato");
     } catch (err) {
         toast.error("Errore durante il logout");
         localStorage.clear();
