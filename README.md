@@ -6,7 +6,7 @@ MEMEMUSEUM è una web application full-stack progettata per gli amanti dei meme.
 
 ### Utenti & Autenticazione
 - **Registrazione e Login**: Sistema di autenticazione sicuro basato su **JWT (JSON Web Tokens)**.
-- **Gestione Sessione**: Persistenza del login tramite localStorage.
+- **Gestione Sessione**: Persistenza del login tramite Cookies.
 
 ### Galleria Meme
 - **Visualizzazione Dinamica**: Card del meme con dettagli su autore, data di pubblicazione e descrizione.
