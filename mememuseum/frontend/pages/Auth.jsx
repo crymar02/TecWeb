@@ -25,32 +25,32 @@ const Auth = ({ onLoginSuccess }) => {
     const toggleAuthMode = () => {
         setIsLogin(!isLogin);
         setFormData(initialState);
-        setShowPassword(false); // Reset visibilità al cambio modalità
+        setShowPassword(false); 
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const url = isLogin 
-            ? 'http://localhost:3000/api/auth/login' 
-            : 'http://localhost:3000/api/auth/signup';
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    const url = isLogin 
+        ? 'http://localhost:3000/api/auth/login' 
+        : 'http://localhost:3000/api/auth/signup';
+    
+    try {
+        const res = await axios.post(url, formData, { withCredentials: true });
         
-        try {
-            const res = await axios.post(url, formData);
-            if (isLogin) {
-                localStorage.setItem('token', res.data.token);
-                localStorage.setItem('username', res.data.user.username);
-                localStorage.setItem('userId', res.data.user.id);
-                toast.success("Login effettuato con successo!");
-                onLoginSuccess();
-                navigate('/');
-            } else {
-                toast.info("Registrazione completata! Ora effettua il login.");
-                setIsLogin(true); 
-            }
-        } catch (err) {
-           toast.error(err.response?.data?.message || "Errore durante l'operazione");
+        if (isLogin) {
+            localStorage.setItem('username', res.data.user.username);
+            localStorage.setItem('userId', res.data.user.id);
+            toast.success("Login effettuato con successo!");
+            onLoginSuccess();
+            navigate('/');
+        } else {
+            toast.info("Registrazione completata! Ora effettua il login.");
+            setIsLogin(true); 
         }
-    };
+    } catch (err) {
+       toast.error(err.response?.data?.message || "Errore durante l'operazione");
+    }
+};
 
     return (
         <div className="auth-container">

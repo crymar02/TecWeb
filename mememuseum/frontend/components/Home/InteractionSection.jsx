@@ -15,6 +15,7 @@ const InteractionSection = ({ meme, isLoggedIn, onActionSuccess }) => {
     if (!isLoggedIn) return toast.warn("Devi effettuare il login per votare!");
     try {
       await axios.post('http://localhost:3000/api/voti', {
+        withCredentials: true,
         meme_id: meme.id_meme, 
         user_id: userId, 
         voto: tipoVoto
@@ -30,6 +31,7 @@ const InteractionSection = ({ meme, isLoggedIn, onActionSuccess }) => {
     if (!nuovoCommento.trim()) return;
     try {
       await axios.post('http://localhost:3000/api/commenti', {
+        withCredentials: true,
         meme_id: meme.id_meme, 
         user_id: userId, 
         contenuto: nuovoCommento
@@ -44,6 +46,7 @@ const InteractionSection = ({ meme, isLoggedIn, onActionSuccess }) => {
   const handleSalvaModifica = async (commentoId) => {
     try {
       await axios.put(`http://localhost:3000/api/commenti/${commentoId}`, {
+        withCredentials: true,
         user_id: userId, 
         nuovoContenuto: testoModifica
       });
@@ -58,6 +61,7 @@ const InteractionSection = ({ meme, isLoggedIn, onActionSuccess }) => {
   const handleEliminaCommento = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/api/commenti/${id}`, {
+        withCredentials: true,
         data: { user_id: userId }
       });
       toast.success("Commento eliminato");

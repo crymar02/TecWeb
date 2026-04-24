@@ -41,8 +41,6 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
-        // 1. Cerca l'utente nel database 
         const userResult = await pool.query('SELECT * FROM utente WHERE email = $1', [email]);
 
         if (userResult.rows.length === 0) {
@@ -50,24 +48,26 @@ export const login = async (req, res) => {
         }
 
         const user = userResult.rows[0];
-
-        // 2. Confronta la password passata con quella hash nel DB
         const isMatch = await bcrypt.compare(password, user.password);
 
         if (!isMatch) {
             return res.status(401).json({ message: "Credenziali non valide" });
         }
 
-        // 3. Crea il Token JWT
         const token = jwt.sign(
             { userId: user.user_id, username: user.username },
             process.env.JWT_SECRET, 
             { expiresIn: '24h' }
         );
 
-        res.json({
+        // --- INVIO TOKEN TRAMITE COOKIE ---
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: false, 
+            sameSite: 'lax',
+            maxAge: 24 * 60 * 60 * 1000 
+        }).json({
             message: "Login effettuato con successo",
-            token: token,
             user: { id: user.user_id, username: user.username }
         });
 
@@ -75,4 +75,12 @@ export const login = async (req, res) => {
         console.error(err.message);
         res.status(500).send("Errore del server durante il login");
     }
+};
+
+export const logout = (req, res) => {
+    res.clearCookie('token', {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: false 
+    }).json({ message: "Logout effettuato con successo" });
 };

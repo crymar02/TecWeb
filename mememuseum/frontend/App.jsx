@@ -2,29 +2,37 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 import './App.css'; 
 import Home from './pages/Home.jsx';
 import Auth from './pages/Auth.jsx';
 import MemeDelGiorno from './pages/MemeDelGiorno.jsx';
 
+axios.defaults.withCredentials = true;
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+useEffect(() => {
+    const username = localStorage.getItem('username');
+    setIsLoggedIn(!!username);
   }, []);
 
   const checkLoginStatus = () => {
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
+    const username = localStorage.getItem('username');
+    setIsLoggedIn(!!username);
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('userId'); 
-    setIsLoggedIn(false);
+const handleLogout = async () => {
+    try {
+        await axios.post('http://localhost:3000/api/auth/logout', {}, { withCredentials: true });
+        localStorage.clear();
+        setIsLoggedIn(false);
+        toast.info("Sessione chiusa");
+    } catch (err) {
+        toast.error("Errore durante il logout");
+        localStorage.clear();
+        setIsLoggedIn(false);
+    }
   };
 
   return (

@@ -24,7 +24,8 @@ const Home = ({ isLoggedIn }) => {
   const fetchMemes = useCallback(async () => {
     try {
       const userId = localStorage.getItem('userId');
-      const res = await axios.get('http://localhost:3000/api/memes', {
+      const res = await axios.get('http://localhost:3000/api/memes', { 
+            withCredentials: true,
         params: { 
           userId,
           sortBy: ordinamento, 

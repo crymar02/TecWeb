@@ -1,6 +1,7 @@
 // backend/app.js
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { pool } from './db.js';  
@@ -15,14 +16,20 @@ const __dirname = path.dirname(__filename);
 
 
 // --- SICUREZZA E MIDDLEWARE BASE ---
-app.disable('x-powered-by'); // Rimuove l'header "X-Powered-By" per nascondere che usiamo Express
-app.use(express.json());    // Parsing del corpo delle richieste in JSON
+app.use(cookieParser());
+app.disable('x-powered-by'); 
+app.use(express.json());    
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const PORT = process.env.PORT || 3000;
 
 // --- ROTTE ---
-app.use(cors()); // Abilita CORS per tutte le rotte 
+app.use(cors(
+    {
+        origin: 'http://localhost:5173',
+        credentials: true
+    }
+)); 
 app.use('/api/auth', authRoutes);
 app.use('/api/memes', memeRoutes);
 app.use('/api/voti', votoRoutes);
