@@ -54,12 +54,17 @@ router.get('/', async (req, res) => {
             )
         `;
 
-        // 2. Filtro per data (se presente)
-       if (date && date !== 'undefined' && date !== '') {
-       queryParams.push(date); 
+        // 2. Filtro per data 
+        if (date && date !== 'undefined' && date !== '') {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        const dateOnly = `${year}-${month}-${day}`; 
 
-       query += ` AND m.data_creazione::date = $${queryParams.length}::date`;
-        }
+        queryParams.push(dateOnly); 
+        query += ` AND m.data_creazione::date = $${queryParams.length}::date`;
+    }
 
         // 3. Group By necessario per le subquery di aggregazione (likes, dislikes, commenti)
         query += ` GROUP BY m.id_meme, u.username`;

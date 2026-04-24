@@ -33,18 +33,28 @@ const SearchBar = ({
       </div>
 
       <div className="date-picker-group">
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date) => {
-            setSelectedDate(date);
-            setPagina(1);
-          }}
-          dateFormat="dd/MM/yyyy"
-          isClearable
-          placeholderText="Cerca per data..."
-          locale="it" 
-          className="custom-date-input"
-        />
+      <DatePicker
+      selected={selectedDate}
+      onChange={(date) => {
+       if (date) {
+      const normalizedDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        12, 0, 0 
+      );
+      setSelectedDate(normalizedDate);
+    } else {
+      setSelectedDate(null);
+    }
+    setPagina(1);
+    }}
+    dateFormat="dd/MM/yyyy"
+    isClearable
+    placeholderText="Cerca per data..."
+    locale="it" 
+    className="custom-date-input"
+    />
       </div>
 
       <div className="sort-options">

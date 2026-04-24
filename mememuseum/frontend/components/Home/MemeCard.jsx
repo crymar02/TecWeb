@@ -101,14 +101,21 @@ const MemeCard = ({ meme, isLoggedIn, onActionSuccess }) => {
           onActionSuccess={onActionSuccess} 
         />
 
-        <div className="meme-footer">
-          <div className="meme-meta">
-            <span className="author">Autore: <strong>{meme.username}</strong></span>
-            <span className="meme-date">
-              {new Date(meme.data_creazione).toLocaleDateString('it-IT')}
-            </span>
-          </div>
+    <div className="meme-footer">
+      <div className="meme-meta">
+        <span className="author">Autore: <strong>{meme.username}</strong></span>
+        <span className="meme-date">
+        Creato il giorno {new Date(meme.data_creazione).toLocaleDateString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      })} alle ore {new Date(meme.data_creazione).toLocaleTimeString('it-IT', {
+        hour: '2-digit',
+        minute: '2-digit'
+      })}
+         </span>
         </div>
+       </div>
       </div>
     </div>
   );

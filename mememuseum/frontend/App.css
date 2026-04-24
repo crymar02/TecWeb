@@ -871,7 +871,7 @@ body {
 .switch-link {
     background: none;
     border: none;
-    color: #800208; /* Il tuo colore bordeaux */
+    color: #800208; 
     text-decoration: underline;
     cursor: pointer;
     font-weight: bold;
@@ -884,6 +884,32 @@ body {
     margin-top: 1.5rem;
     font-size: 0.9rem;
     color: #555;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding-right: 45px; 
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #800208; 
+  font-size: 1.1rem;
+  z-index: 2;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-icon:hover {
+  color: var(--accent-color); 
 }
 
 /* --- 15. RESPONSIVE DESIGN --- */

@@ -13,9 +13,8 @@ const initialState = {
 
 const Auth = ({ onLoginSuccess }) => {
     const [isLogin, setIsLogin] = useState(true);
-    const [formData, setFormData] = useState({
-        nome: '', cognome: '', username: '', email: '', password: ''
-    });
+    const [showPassword, setShowPassword] = useState(false); // Nuovo stato
+    const [formData, setFormData] = useState(initialState);
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -24,33 +23,30 @@ const Auth = ({ onLoginSuccess }) => {
 
     const toggleAuthMode = () => {
         setIsLogin(!isLogin);
-        setFormData(initialState); 
+        setFormData(initialState);
+        setShowPassword(false); // Reset visibilità al cambio modalità
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Determina l'endpoint in base alla modalità (login o signup)
         const url = isLogin 
             ? 'http://localhost:3000/api/auth/login' 
             : 'http://localhost:3000/api/auth/signup';
         
         try {
             const res = await axios.post(url, formData);
-            setFormData(initialState);
             if (isLogin) {
                 localStorage.setItem('token', res.data.token);
                 localStorage.setItem('username', res.data.user.username);
                 localStorage.setItem('userId', res.data.user.id);
-                toast.success("Login effettuato con successo!")
+                toast.success("Login effettuato con successo!");
                 onLoginSuccess();
                 navigate('/');
             } else {
                 toast.info("Registrazione completata! Ora effettua il login.");
-                setFormData(initialState);
                 setIsLogin(true); 
             }
         } catch (err) {
-            setFormData(initialState);
            toast.error(err.response?.data?.message || "Errore durante l'operazione");
         }
     };
@@ -62,13 +58,31 @@ const Auth = ({ onLoginSuccess }) => {
                 <form onSubmit={handleSubmit}>
                     {!isLogin && (
                         <>
-                            <input type="text" name="nome" placeholder="Nome" onChange={handleChange} required />
-                            <input type="text" name="cognome" placeholder="Cognome" onChange={handleChange} required />
-                            <input type="text" name="username" placeholder="Username" onChange={handleChange} required />
+                            <input type="text" name="nome" placeholder="Nome" value={formData.nome} onChange={handleChange} required />
+                            <input type="text" name="cognome" placeholder="Cognome" value={formData.cognome} onChange={handleChange} required />
+                            <input type="text" name="username" placeholder="Username" value={formData.username} onChange={handleChange} required />
                         </>
                     )}
                     <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-                    <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
+                    
+                    {/* Container per la password con icona */}
+                    <div className="password-wrapper">
+                        <input 
+                            type={showPassword ? "text" : "password"} 
+                            name="password" 
+                            placeholder="Password" 
+                            value={formData.password} 
+                            onChange={handleChange} 
+                            required 
+                        />
+                        <span 
+                            className="password-toggle-icon" 
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            <i className={showPassword ? "fas fa-eye-slash" : "fas fa-eye"}></i>
+                        </span>
+                    </div>
+
                     <button type="submit" className="btn-auth">
                         {isLogin ? 'Login' : 'Crea Account'}
                     </button>
@@ -76,11 +90,7 @@ const Auth = ({ onLoginSuccess }) => {
 
                 <div className="switch-auth">
                     <span>{isLogin ? "Non hai un account?" : "Hai già un account?"}</span>
-                    <button 
-                        type="button" 
-                        className="switch-link" 
-                        onClick={toggleAuthMode}
-                    >
+                    <button type="button" className="switch-link" onClick={toggleAuthMode}>
                         {isLogin ? 'Registrati qui' : 'Accedi qui'}
                     </button>
                 </div>
