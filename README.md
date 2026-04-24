@@ -141,8 +141,8 @@ L'interfaccia sarà navigabile alla porta suggerita dal terminale.
 │   ├── db.js               # Configurazione PostgreSQL Pool
 │   └── .env                # Variabili d'ambiente (DB URL, Port, JWT Secret)
 ├── frontend/
-│   │   ├── components/Home  # Componenti React (InteractionSection, MemeCard, UploadCard, SearchBar, Pagination)
-│   │   ├── pages/          # Pagine principali React (Home, Auth, MemeDelGiorno)
+│   │   ├── components/Home  # Componenti React con rispettivi css (InteractionSection, MemeCard, UploadCard, SearchBar, Pagination)
+│   │   ├── pages/          # Pagine principali React con rispettivi css (Home, Auth, MemeDelGiorno)
 │   │   ├── App.jsx         # Componente principale e Router
 │   │   ├── App.css         # Stile dell'applicazione
 │   │   └── index.js        # Entry point React
